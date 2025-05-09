@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Talent Corner - Data Visualization Dashboard</title>
+  <!-- Import Google Fonts and Chart.js -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Basic Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      padding: 20px;
+      margin-left: 220px;
+    }
+    h1, h2 {
+      color: #54397e;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    /* Sidebar (unchanged) */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #54397e;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar-header {
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px 0;
+      background-color: #432c65;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+    }
+    .toggle-btn {
+      font-size: 16px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background-color: rgba(255,255,255,0.2);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .toggle-btn:hover { transform: scale(1.02); }
+    .logout-btn {
+      background: #ff4d4d;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      justify-content: center;
+      margin-top: auto;
+      width: 100%;
+      box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .logout-btn:hover { background: #c82333; }
+    .logout-btn:active { transform: scale(0.95); }
+    .logout-btn svg { width: 18px; height: 18px; fill: white; }
+    .sidebar-profile {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px 0;
+    }
+    .profile-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .candidate-sidebar, .client-sidebar {
+      position: fixed;
+      top: 0;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #3a2c5b;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+      transition: right 0.4s ease-in-out;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+      z-index: 21;
+    }
+    .sidebar-link {
+      font-size: 16px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .sidebar-link.active {
+      background-color: #432c65;
+      border-left: 4px solid #ff4d4d;
+    }
+    .sidebar-link:hover {
+      background-color: rgba(255,255,255,0.2);
+      transform: scale(1.02);
+    }
+    .sidebar-header-bar {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid white;
+      margin-bottom: 20px;
+    }
+    .close-btn {
+      cursor: pointer;
+      font-size: 20px;
+      transition: color 0.2s;
+    }
+    .close-btn:hover { color: #ff4d4d; }
+
+    /* Dashboard Layout: Header then Count Cards then Charts */
+    .dashboard {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Count Cards Section */
+    .count-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-around;
+      /* Initially hidden for animation */
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+    .count-card {
+      background: #fff;
+      border-left: 5px solid #54397e;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      flex: 1 1 150px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      min-width: 150px;
+    }
+    .count-card .icon {
+      font-size: 28px;
+      background: #f0ebf8;
+      color: #54397e;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .count-card .info {
+      display: flex;
+      flex-direction: column;
+    }
+    .count-card .label {
+      font-size: 14px;
+      color: #666;
+    }
+    .count-card .number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #54397e;
+    }
+
+    /* Charts Section */
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      /* Initially hidden for animation */
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+      animation-delay: 0.3s;
+    }
+    .chart-container {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 15px;
+      height: 300px;
+      position: relative;
+      box-sizing: border-box;
+    }
+    .chart-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    /* Fade In Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Error and Success Messages */
+    #messageContainer {
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+      display: none;
+    }
+    .error-message {
+      background: #ffbaba;
+      color: #d8000c;
+      border: 1px solid #d8000c;
+    }
+    .success-message {
+      background: #dff0d8;
+      color: #2d862d;
+      border: 1px solid #2d862d;
+    }
+    
+    @media (max-width: 768px) {
+      .chart-container { height: 250px; }
+      .count-card .number { font-size: 20px; }
+      body { margin-left: 0; padding: 10px; }
+      .charts { grid-template-columns: 1fr; }
+    }
+    .sidebar-link.active {
+      background-color: #432c65;
+      border-left: 4px solid #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar (unchanged) -->
+  <div class="sidebar">
+    <div class="sidebar-profile">
+      <img src="/Talentcornerlogo.jpg" alt="Talent Corner" class="profile-img"/>
+    </div>
+    <div class="sidebar-header">Talent Corner</div>
+    <div class="toggle-btn" onclick="toggleCandidateSidebar()">Candidate Data</div>
+    <div class="toggle-btn" onclick="toggleClientSidebar()">Franchises Data</div>
+    <a href="/logout" class="logout-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M10 2v2H4v16h6v2H2V2h8zm3.707 5.707L18.414 12l-4.707 4.293-1.414-1.414L15.586 12l-3.293-3.293 1.414-1.414z"/>
+      </svg>
+      Sign Out
+    </a>
+  </div>
+
+  <!-- Candidate Data Sidebar -->
+  <div class="candidate-sidebar" id="candidateSidebar">
+    <div class="sidebar-header-bar">
+      Candidate Data
+      <span class="close-btn" onclick="toggleCandidateSidebar()">✖</span>
+    </div>
+    <div class="sidebar-link active" onclick="window.location.href='/datavisualization.html'">Data Visualization</div>
+    <div class="sidebar-link" onclick="window.location.href='dashboard.html'">Import Excel</div>
+    <div class="sidebar-link" onclick="window.location.href='imported_data.html'">Imported Data</div>
+    <div class="sidebar-link" onclick="window.location.href='/form1data.html'">Form1 Data</div>
+    <div class="sidebar-link" onclick="window.location.href='candidate_ranking.html'">Candidate's Ranking</div>
+    <div class="sidebar-link" onclick="window.location.href='AdminloginData.html'">Admin Login Data</div>
+  </div>
+
+  <!-- Client Data Sidebar -->
+  <div class="client-sidebar" id="clientSidebar">
+    <div class="sidebar-header-bar">
+      Franchises Data
+      <span class="close-btn" onclick="toggleClientSidebar()">✖</span>
+    </div>
+    <div class="sidebar-link" onclick="window.location.href='/Franchisesignupdata.html'">Franchises SignUp Data</div>
+    <div class="sidebar-link" onclick="window.location.href='/client2'">Client 2</div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard">
+    <div id="messageContainer"></div>
+    <!-- Header appears first -->
+    <h1>Talent Corner Dashboard</h1>
+    <!-- Count Cards Section (will fade in) -->
+    <div class="count-cards">
+      <div class="count-card">
+        <div class="icon">👥</div>
+        <div class="info">
+          <div class="label">Total Admins</div>
+          <div class="number" id="usersCount">0</div>
+        </div>
+      </div>
+      <div class="count-card">
+        <div class="icon">🏆</div>
+        <div class="info">
+          <div class="label">Candidates (Filtered)</div>
+          <div class="number" id="candidateCount">0</div>
+        </div>
+      </div>
+      <div class="count-card">
+        <div class="icon">📝</div>
+        <div class="info">
+          <div class="label">Form1 Entries</div>
+          <div class="number" id="form1Count">0</div>
+        </div>
+      </div>
+      <div class="count-card">
+        <div class="icon">🔐</div>
+        <div class="info">
+          <div class="label">Franchise Logins</div>
+          <div class="number" id="franchiseCount">0</div>
+        </div>
+      </div>
+      <div class="count-card">
+        <div class="icon">📥</div>
+        <div class="info">
+          <div class="label">Imported Data</div>
+          <div class="number" id="importedCount">0</div>
+        </div>
+      </div>
+    </div>
+    <!-- Charts Section (will fade in with a slight delay) -->
+    <div class="charts">
+      <!-- Candidates by Domain (Bar Chart) -->
+      <div>
+        <h2>Candidates by Domain</h2>
+        <div class="chart-container">
+          <canvas id="candidateBarChart"></canvas>
+        </div>
+      </div>
+      <!-- Candidate Registrations by Date (Master Year Chart) -->
+      <div style="grid-column: span 2;">
+        <h2>Candidate Registrations by Date (Yearly)</h2>
+        <div class="chart-container">
+          <canvas id="candidateDateBarChart"></canvas>
+        </div>
+      </div>
+      <!-- Form1 Gender Distribution -->
+      <div>
+        <h2>Form1 Gender Distribution</h2>
+        <div class="chart-container">
+          <canvas id="form1PieChart"></canvas>
+        </div>
+      </div>
+      <!-- Candidates by Subdomain -->
+      <div>
+        <h2>Candidates by Subdomain</h2>
+        <div class="chart-container">
+          <canvas id="candidateSubdomainChart"></canvas>
+        </div>
+      </div>
+      <!-- Candidate Registrations by Month for Selected Year -->
+      <div style="grid-column: span 3;">
+        <h2>Candidate Registrations by Month for Selected Year</h2>
+        <div class="chart-container" style="height:350px;">
+          <canvas id="candidateMonthChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variable for current year filter
+    let currentFilter = '';
+
+    // Initialize Chart Instances
+    const ctxCandidateDate = document.getElementById('candidateDateBarChart').getContext('2d');
+    const candidateDateBarChart = new Chart(ctxCandidateDate, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{ label: 'Registrations', data: [], backgroundColor: '#36A2EB' }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { x: { title: { display: true, text: 'Year' } } },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    const ctxCandidateMonth = document.getElementById('candidateMonthChart').getContext('2d');
+    const candidateMonthChart = new Chart(ctxCandidateMonth, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{ label: 'Registrations', data: [], backgroundColor: '#FF9F40' }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { x: { title: { display: true, text: 'Month' } } },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    const ctxCandidateDomain = document.getElementById('candidateBarChart').getContext('2d');
+    const candidateBarChart = new Chart(ctxCandidateDomain, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{ label: 'Candidates', data: [], backgroundColor: '#54397e' }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { x: { title: { display: true, text: '' } } },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    const ctxForm1 = document.getElementById('form1PieChart').getContext('2d');
+    const form1PieChart = new Chart(ctxForm1, {
+      type: 'pie',
+      data: { labels: [], datasets: [{ data: [], backgroundColor: ['#36A2EB', '#FF6384'] }] },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    const ctxCandidateSubdomain = document.getElementById('candidateSubdomainChart').getContext('2d');
+    const candidateSubdomainChart = new Chart(ctxCandidateSubdomain, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{ label: 'Candidates', data: [], backgroundColor: '#8e44ad' }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { x: { title: { display: true, text: '' } } },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Update data functions for charts and count cards
+    async function updateCandidateData(filter = '') {
+      try {
+        const filterParam = filter ? `&filter=${encodeURIComponent(filter)}` : '';
+        const countRes = await fetch(`http://localhost:3000/api/candidate-count?filter=${filter}`);
+        const countData = await countRes.json();
+        document.getElementById('candidateCount').textContent = countData.total || 0;
+
+        const domainRes = await fetch(`http://localhost:3000/api/candidate-by-domain?filter=${filter}`);
+        const domainData = await domainRes.json();
+        candidateBarChart.data.labels = domainData.map(row => row.Domain);
+        candidateBarChart.data.datasets[0].data = domainData.map(row => row.count);
+        candidateBarChart.options.scales.x.title.text = filter || 'All Years';
+        candidateBarChart.update();
+
+        const subdomainRes = await fetch(`http://localhost:3000/api/candidate-by-subdomain?filter=${filter}`);
+        const subdomainData = await subdomainRes.json();
+        candidateSubdomainChart.data.labels = subdomainData.map(row => row.Sub_Domain);
+        candidateSubdomainChart.data.datasets[0].data = subdomainData.map(row => row.count);
+        candidateSubdomainChart.options.scales.x.title.text = filter || 'All Years';
+        candidateSubdomainChart.update();
+
+        const dateRes = await fetch(`http://localhost:3000/api/candidate-by-date?group=year${filter ? '&filter=' + filter : ''}`);
+        const dateData = await dateRes.json();
+        const yearLabels = dateData.map(row => row.Year);
+        const yearCounts = dateData.map(row => row.count);
+        candidateDateBarChart.data.labels = yearLabels;
+        candidateDateBarChart.data.datasets[0].data = yearCounts;
+        candidateDateBarChart.options.scales.x.title.text = filter || 'Year';
+        candidateDateBarChart.update();
+      } catch (error) {
+        console.error('Error updating candidate data:', error);
+      }
+    }
+
+    async function updateMonthChart(selectedYear) {
+      try {
+        if (!selectedYear) {
+          candidateMonthChart.data.labels = [];
+          candidateMonthChart.data.datasets[0].data = [];
+          candidateMonthChart.update();
+          return;
+        }
+        const monthRes = await fetch(`http://localhost:3000/api/candidate-by-date?group=month&filter=${selectedYear}`);
+        const monthData = await monthRes.json();
+        let labels = [];
+        let counts = [];
+        monthData.forEach(row => {
+          let monthLabel = row.Month;
+          if (!isNaN(monthLabel)) {
+            monthLabel = new Date(2000, parseInt(monthLabel, 10) - 1, 1)
+                          .toLocaleString('default', { month: 'short' });
+          }
+          labels.push(monthLabel);
+          counts.push(row.count);
+        });
+        candidateMonthChart.data.labels = labels;
+        candidateMonthChart.data.datasets[0].data = counts;
+        candidateMonthChart.options.scales.x.title.text = 'Month';
+        candidateMonthChart.update();
+      } catch (error) {
+        console.error('Error updating month chart:', error);
+      }
+    }
+
+    document.getElementById('candidateDateBarChart').onclick = function(evt) {
+      const points = candidateDateBarChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+      if (points.length) {
+        let clickedYear = candidateDateBarChart.data.labels[points[0].index];
+        currentFilter = currentFilter === clickedYear ? '' : clickedYear;
+        updateCandidateData(currentFilter);
+        updateMonthChart(currentFilter);
+      }
+    };
+
+    async function updateDashboard() {
+      try {
+        const usersRes = await fetch('http://localhost:3000/api/users');
+        const usersData = await usersRes.json();
+        document.getElementById('usersCount').textContent = usersData.total || 0;
+
+        const form1Res = await fetch('http://localhost:3000/api/form1data');
+        const form1Data = await form1Res.json();
+        document.getElementById('form1Count').textContent = form1Data.total || 0;
+        form1PieChart.data.labels = Object.keys(form1Data.genders || {});
+        form1PieChart.data.datasets[0].data = Object.values(form1Data.genders || {});
+        form1PieChart.update();
+
+        const franchiseRes = await fetch('http://localhost:3000/api/franchiselogindata');
+        const franchiseData = await franchiseRes.json();
+        document.getElementById('franchiseCount').textContent = franchiseData.total || 0;
+
+        const importedRes = await fetch('http://localhost:3000/api/importeddata');
+        const importedData = await importedRes.json();
+        document.getElementById('importedCount').textContent = importedData.total || 0;
+
+        updateCandidateData(currentFilter);
+        updateMonthChart(currentFilter);
+      } catch (error) {
+        console.error('Error updating dashboard:', error);
+      }
+    }
+
+    function toggleCandidateSidebar() {
+      const clientSidebar = document.getElementById("clientSidebar");
+      const candidateSidebar = document.getElementById("candidateSidebar");
+      candidateSidebar.style.right = candidateSidebar.style.right === "0px" ? "-250px" : "0px";
+      clientSidebar.style.right = "-250px";
+    }
+    function toggleClientSidebar() {
+      const clientSidebar = document.getElementById("clientSidebar");
+      const candidateSidebar = document.getElementById("candidateSidebar");
+      clientSidebar.style.right = clientSidebar.style.right === "0px" ? "-250px" : "0px";
+      candidateSidebar.style.right = "-250px";
+    }
+
+    updateDashboard();
+    setInterval(updateDashboard, 30000);
+
+    // Toggle the user avatar dropdown menu
+    function toggleUserMenu() {
+      const profile = document.querySelector('.user-profile');
+      profile.classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+      const profile = document.querySelector('.user-profile');
+      if (!profile.contains(e.target)) {
+        profile.classList.remove('open');
+      }
+    });
+  </script>
+</body>
+</html>

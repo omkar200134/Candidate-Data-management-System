@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Talent Corner - Franchise Login Data</title>
+  <!-- Import Google Fonts for Material Icons and Roboto font -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+  <style>
+    /* Base Styles */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      overflow-y: hidden;
+    }
+    #messageContainer {
+      margin: 10px 0;
+    }
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #54397e;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar-header {
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px 0;
+      background-color: #432c65;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .sidebar-link {
+      font-size: 16px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .sidebar-link.active {
+      background-color: #432c65;
+      border-left: 4px solid #ff4d4d;
+    }
+    .sidebar-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.02);
+    }
+    h3 {
+      color: #54397e;
+      margin-left: 25px;
+    }
+    /* Logout Button */
+    .logout-btn {
+      background: #ff4d4d;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      justify-content: center;
+      margin-top: auto;
+      width: 100%;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .logout-btn:hover {
+      background: #c82333;
+    }
+    .logout-btn:active, button:active {
+      transform: scale(0.95);
+    }
+    .logout-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+    /* Content Area */
+    .content {
+      margin-left: 220px;
+      padding: 20px;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    table thead {
+      background-color: #54397e;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1; 
+    }
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    table tr:hover {
+      background-color: #ddd;
+    }
+    /* Table Container with Fade In Transition */
+    #tableContainer {
+      max-height: 315px; /* Adjust as needed */
+      overflow-y: scroll;
+      position: relative; /* Enables sticky header */
+      scrollbar-width: thin;
+      scrollbar-color: #54397e #f1f1f1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    #tableContainer::-webkit-scrollbar {
+      width: 12px;
+    }
+    #tableContainer::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    #tableContainer::-webkit-scrollbar-thumb {
+      background: #54397e;
+      border-radius: 6px;
+    }
+    /* Table Action Button */
+    .action-btn {
+      padding: 6px 12px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .action-btn:hover:not(:disabled) {
+      background-color: #432c65;
+      transform: scale(1.03);
+    }
+    .action-btn:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    /* Email Section Buttons (Hidden initially) */
+    #emailSection {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+    }
+    #emailSection button {
+      padding: 10px 20px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 0 5px;
+    }
+    #emailSection button:hover:not(:disabled) {
+      background-color: #432c65;
+      transform: scale(1.02);
+    }
+    #emailSection button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    /* Sidebars for Candidate and Client Data */
+    .candidate-sidebar, .client-sidebar {
+      position: fixed;
+      top: 0;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #3a2c5b;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+      transition: right 0.4s ease-in-out;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+      z-index: 3;
+    }
+    .sidebar-header-bar {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid white;
+      margin-bottom: 20px;
+    }
+    .close-btn {
+      cursor: pointer;
+      font-size: 20px;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: #ff4d4d;
+    }
+    .toggle-btn {
+      font-size: 16px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background-color: rgba(255, 255, 255, 0.2);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .toggle-btn:hover {
+      transform: scale(1.02);
+    }
+    /* Profile Image */
+    .sidebar-profile {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px 0;
+    }
+    .profile-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .pagination button {
+      padding: 8px 16px;
+      margin: 0 4px;
+      background-color: #54397e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .pagination button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .pagination-info {
+      display: inline-block;
+      margin: 0 20px;
+      font-size: 14px;
+    }
+    /* Spin Animation */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Spinner */
+    .small-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #54397e;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+      animation: spin 1s linear infinite;
+    }
+    /* Headings with Fade In Transition */
+    h1 {
+      color: #54397e;
+      margin-top: 0px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    /* Add fade transition to the user count container */
+    .user-count-container {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    /* Unified message styling */
+    .error-message, .error, .success-message, .info-message {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      clear: both;
+      font-weight: 500;
+    }
+    .error-message, .error {
+      color: #d8000c;
+      background-color: #ffbaba;
+      border: 1px solid #d8000c;
+    }
+    .success-message {
+      color: #2d862d;
+      background-color: #dff0d8;
+      border: 1px solid #2d862d;
+    }
+    .info-message {
+      color: #00529B;
+      background-color: #BDE5F8;
+      border: 1px solid #00529B;
+    }
+    /* Modal Overlay */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+    h3 {
+      color:#54397e;
+      margin-left: 25px;
+    }
+    /* Modal Content with Symmetrical Padding */
+    .modal-content {
+      background: #fff;
+      padding: 24px;
+      border-radius: 4px;
+      text-align: center;
+      width: 400px;
+      max-width: 90%;
+      max-height: 85vh;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                  0 3px 6px rgba(0, 0, 0, 0.23);
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+    }
+    /* Close Button Positioned Symmetrically */
+    .close {
+      position: absolute;
+      top: 12px;
+      right: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .close:hover {
+      color: #54397e;
+    }
+    /* Modal Scrollable Inner Content */
+    .modal-content-inner {
+      max-height: calc(85vh - 100px);
+      overflow-y: auto;
+      margin-top: 20px;
+      padding-right: 8px;
+    }
+    .modal-content-inner::-webkit-scrollbar-track {
+      width: 6px;
+    }
+    .modal-content-inner::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    .modal-content-inner::-webkit-scrollbar-thumb {
+      background: #54397e;
+      border-radius: 3px;
+    }
+    /* Modal Form Fields */
+    .modal-content label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #54397e;
+      text-align: left;
+    }
+    .modal-content input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .modal-content input[type="text"]:focus {
+      border-color: #54397e;
+      box-shadow: 0 0 5px rgba(84, 57, 126, 0.5);
+      outline: none;
+    }
+    /* Modal Buttons Container */
+    .modal-buttons {
+      position: sticky;
+      bottom: 0;
+      background-color: #fefefe;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+    .modal-buttons button {
+      padding: 10px 20px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background-color 0.3s ease;
+    }
+    .modal-buttons button:hover {
+      background-color: #432c65;
+    }
+    #modEmailStatus {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    #modEmailStatus:focus {
+      border-color: #54397e;
+      box-shadow: 0 0 5px rgba(84, 57, 126, 0.5);
+      outline: none;
+    }
+    #addPassword {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    #addPassword:focus {
+      border-color: #54397e;
+      box-shadow: 0 0 5px rgba(84, 57, 126, 0.5);
+      outline: none;
+    }
+    /* Keyframes for Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    #processing {
+      display: none !important;
+    }
+    /* User Count Dashboard */
+    .user-count-container {
+      margin: 0;
+      /* Already added opacity and transition above */
+    }
+    .user-count-card {
+      display: flex;
+      align-items: center;
+      background-color: white;
+      border-left: 5px solid #54397e;
+      border-radius: 8px;
+      padding: 10px 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      width: fit-content;
+      min-width: 180px;
+    }
+    .user-count-icon {
+      font-size: 22px;
+      margin-right: 15px;
+      background-color: #f0ebf8;
+      color: #54397e;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .user-count-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-count-label {
+      font-size: 12px;
+      color: #666;
+    }
+    .user-count-number {
+      font-size: 20px;
+      font-weight: bold;
+      color: #54397e;
+    }
+    /* Header and User Count Container */
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .header-container h1 {
+      margin: 0;
+      padding: 0;
+    }
+    .user-count-card:hover .user-count-number {
+      color: #4a90e2;
+    }
+  </style>
+  <script>
+    let currentData = null;
+    let currentPage = 1;
+    const ROWS_PER_PAGE = 50;
+    let modifyRecordId = null;
+
+    window.onload = function() {
+      // Begin by fading in the header.
+      document.getElementById("pageHeader").style.opacity = "1";
+
+      // Fade in the user count container after header appears.
+      setTimeout(() => {
+        const userCountContainer = document.querySelector('.user-count-container');
+        if(userCountContainer) userCountContainer.style.opacity = "1";
+      }, 500); // Adjust delay if needed
+
+      // Fade in the table container after the user count container.
+      setTimeout(() => { 
+        document.getElementById("tableContainer").style.opacity = "1"; 
+      }, 1000); // Adjust delay as needed
+
+      // Fade in the email section
+      document.getElementById("emailSection").style.opacity = "1";
+
+      // Initialize user count to 0
+      document.getElementById('userCountDisplay').textContent = '0';
+
+      // Optionally, ensure header and table have proper opacity (already done above)
+
+      // Reload data every 30 seconds
+      setInterval(() => loadData(false), 30000);
+
+      // Load initial data
+      loadData(true);
+    };
+
+    function showCustomMessage(message, type) {
+      const container = document.getElementById('messageContainer');
+      const headerContainer = document.querySelector('.header-container');
+      
+      // Hide the header container when a message appears
+      if (headerContainer) {
+        headerContainer.style.display = 'none';
+      }
+      
+      container.innerHTML = message;
+      container.className = type === 'error' ? 'error-message' : 'success-message';
+      container.style.display = 'block';
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // After 4 seconds, remove the message and show the header again
+      setTimeout(() => {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        if (headerContainer) {
+          headerContainer.style.display = 'flex';
+        }
+      }, 4000);
+    }
+
+    function showProcessing() {
+      const spinner = document.getElementById('processing');
+      spinner.style.display = 'block';
+      spinner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function hideProcessing() {
+      document.getElementById('processing').style.display = 'none';
+    }
+
+    // Load data from /franchiselogindata/ endpoint
+    function loadData(showSpinner = true) {
+      if (showSpinner) showProcessing();
+      fetch('/franchiselogindata/')
+        .then(response => response.json())
+        .then(data => {
+          if (showSpinner) hideProcessing();
+          currentData = data;
+          displayData(currentPage);
+          updateUserCount();
+        })
+        .catch(error => {
+          if (showSpinner) hideProcessing();
+          showCustomMessage("Error loading data: " + (error.message || error), 'error');
+        });
+    }
+
+    function displayData(page) {
+      const container = document.getElementById('tableContainer');
+      if (!currentData || !currentData.headers || !currentData.rows || currentData.rows.length === 0) {
+        container.innerHTML = '<div class="error-message">No data found.</div>';
+        return;
+      }
+      currentPage = page;
+      const startIndex = (page - 1) * ROWS_PER_PAGE;
+      const paginatedRows = currentData.rows.slice(startIndex, startIndex + ROWS_PER_PAGE);
+      let tableHTML = '<table><thead><tr>';
+      tableHTML += '<th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" /></th>';
+      currentData.headers.forEach(header => {
+        tableHTML += `<th>${header}</th>`;
+      });
+      tableHTML += '<th>Actions</th></tr></thead><tbody>';
+      paginatedRows.forEach(row => {
+        const recordId = row.id;
+        const checkboxId = "checkbox_" + recordId;
+        tableHTML += `<tr onclick="rowClicked(event, '${checkboxId}')">`;
+        tableHTML += `<td><input type="checkbox" id="${checkboxId}" data-recordid="${recordId}" class="dataCheckbox" onclick="event.stopPropagation();" /></td>`;
+        tableHTML += `<td>${row.id || ""}</td>`;
+        tableHTML += `<td>${row.Email || ""}</td>`;
+        tableHTML += `<td>${row.Password ? "*****" : ""}</td>`;
+        tableHTML += `<td>${row["Organization name"] || ""}</td>`;
+        tableHTML += `<td>${row.Timestamp || ""}</td>`;
+        tableHTML += `<td>${row.Otp || ""}</td>`;
+        tableHTML += `<td onclick="event.stopPropagation();">
+                        <button class="action-btn" onclick='openModifyModal(${recordId}, ${JSON.stringify(row).replace(/"/g, '&quot;')})'>Modify</button>
+                      </td>`;
+        tableHTML += '</tr>';
+      });
+      tableHTML += '</tbody></table>';
+      container.innerHTML = tableHTML;
+      updatePagination();
+    }
+
+    function rowClicked(event, checkboxId) {
+      if (event.target.tagName.toLowerCase() === 'input') return;
+      const checkbox = document.getElementById(checkboxId);
+      if (checkbox) checkbox.checked = !checkbox.checked;
+    }
+
+    function toggleSelectAll(source) {
+      const checkboxes = document.querySelectorAll('.dataCheckbox');
+      checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(currentData.rows.length / ROWS_PER_PAGE);
+      const paginationContainer = document.getElementById('paginationContainer');
+      let paginationHTML = `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+      paginationHTML += `<span class="pagination-info">Page ${currentPage} of ${totalPages}</span>`;
+      paginationHTML += `<button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Next</button>`;
+      paginationContainer.innerHTML = paginationHTML;
+    }
+
+    function changePage(page) { displayData(page); }
+
+    // Modify Modal functions
+    function openModifyModal(recordId, rowData) {
+      modifyRecordId = recordId;
+      enableModalInputs();
+      hideModalSpinner();
+      document.getElementById('modId').value = recordId;
+      document.getElementById('modEmail').value = rowData.Email || "";
+      document.getElementById('modOrganization').value = rowData["Organization name"] || "";
+      document.getElementById('modifyModal').style.display = 'flex';
+    }
+
+    function closeModifyModal() {
+      document.getElementById('modifyModal').style.display = 'none';
+      modifyRecordId = null;
+      enableModalInputs();
+      hideModalSpinner();
+    }
+
+    // Add Modal functions
+    function openAddModal() {
+      modifyRecordId = null;
+      document.getElementById('addEmail').value = "";
+      document.getElementById('addPassword').value = "";
+      document.getElementById('addOrganization').value = "";
+      document.getElementById('addModal').style.display = 'flex';
+    }
+
+    function closeAddModal() {
+      document.getElementById('addModal').style.display = 'none';
+    }
+
+    function disableModalInputs() {
+      ['modEmail', 'modOrganization'].forEach(id => {
+        document.getElementById(id).disabled = true;
+      });
+      const saveBtn = document.querySelector('.modal-buttons button:last-child');
+      if (saveBtn) saveBtn.disabled = true;
+    }
+
+    function enableModalInputs() {
+      ['modEmail', 'modOrganization'].forEach(id => {
+        document.getElementById(id).disabled = false;
+      });
+      const saveBtn = document.querySelector('.modal-buttons button:last-child');
+      if (saveBtn) saveBtn.disabled = false;
+    }
+
+    function showModalSpinner() {
+      const spinner = document.getElementById('modalSpinner');
+      if (spinner) spinner.style.display = 'block';
+    }
+
+    function hideModalSpinner() {
+      const spinner = document.getElementById('modalSpinner');
+      if (spinner) spinner.style.display = 'none';
+    }
+
+    function confirmModify() {
+      const dataToSend = {
+        id: modifyRecordId,
+        email: document.getElementById('modEmail').value,
+        organization: document.getElementById('modOrganization').value
+      };
+      disableModalInputs();
+      showModalSpinner();
+      fetch('/franchiselogindata/modify-record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSend)
+      })
+      .then(response => response.json())
+      .then(result => {
+        hideModalSpinner();
+        enableModalInputs();
+        if (result.success) {
+          showCustomMessage(result.message, 'success');
+          closeModifyModal();
+          loadData(true);
+        } else {
+          showCustomMessage(result.error, 'error');
+        }
+      })
+      .catch(error => {
+        hideModalSpinner();
+        enableModalInputs();
+        showCustomMessage(error.message || error, 'error');
+      });
+    }
+
+    function confirmAdd() {
+      const dataToSend = {
+        email: document.getElementById('addEmail').value,
+        password: document.getElementById('addPassword').value,
+        organization: document.getElementById('addOrganization').value
+      };
+      showModalSpinner();
+      fetch('/franchiselogindata/add-record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSend)
+      })
+      .then(response => response.json())
+      .then(result => {
+        hideModalSpinner();
+        if (result.success) {
+          showCustomMessage(result.message, 'success');
+          closeAddModal();
+          loadData(true);
+        } else {
+          showCustomMessage(result.error, 'error');
+        }
+      })
+      .catch(error => {
+        hideModalSpinner();
+        showCustomMessage(error.message || error, 'error');
+      });
+    }
+
+    function triggerDeleteSelected() {
+      const checkboxes = document.querySelectorAll('.dataCheckbox:checked');
+      if (checkboxes.length === 0) {
+        showCustomMessage("No rows selected.", "error");
+        return;
+      }
+      openConfirmDeleteModal();
+    }
+
+    function openConfirmDeleteModal() {
+      document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    function confirmDelete() {
+      document.getElementById('confirmModal').style.display = 'none';
+      const checkboxes = document.querySelectorAll('.dataCheckbox:checked');
+      let idsToDelete = [];
+      checkboxes.forEach(cb => {
+        const recordId = parseInt(cb.getAttribute('data-recordid'));
+        if (!isNaN(recordId)) { idsToDelete.push(recordId); }
+      });
+      showProcessing();
+      fetch('/franchiselogindata/delete-records', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: idsToDelete })
+      })
+      .then(response => response.json())
+      .then(result => {
+        hideProcessing();
+        if(result.success) {
+          showCustomMessage(result.message, "success");
+          loadData(true);
+        } else {
+          showCustomMessage(result.error, "error");
+        }
+      })
+      .catch(error => {
+        hideProcessing();
+        showCustomMessage(error.message || error, "error");
+      });
+    }
+
+    function cancelDelete() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+
+    function triggerDeleteAll() {
+      document.getElementById('deleteAllModal').style.display = 'flex';
+    }
+
+    function confirmDeleteAll() {
+      document.getElementById('deleteAllModal').style.display = 'none';
+      showProcessing();
+      fetch('/franchiselogindata/deleteAll', { method: 'DELETE' })
+        .then(response => response.text())
+        .then(message => {
+          hideProcessing();
+          showCustomMessage(message, "success");
+          loadData(true);
+        })
+        .catch(error => {
+          hideProcessing();
+          showCustomMessage(error.message || error, "error");
+        });
+    }
+    
+    function toggleCandidateSidebar() {
+      var clientSidebar = document.getElementById("clientSidebar");
+      var candidateSidebar = document.getElementById("candidateSidebar");
+      if (candidateSidebar.style.right === "0px") {
+        candidateSidebar.style.right = "-250px";
+      } else {
+        candidateSidebar.style.right = "0px";
+        clientSidebar.style.right = "-250px";
+      }
+    }
+    
+    function toggleClientSidebar() {
+      var clientSidebar = document.getElementById("clientSidebar");
+      var candidateSidebar = document.getElementById("candidateSidebar");
+      if (clientSidebar.style.right === "0px") {
+        clientSidebar.style.right = "-250px";
+      } else {
+        clientSidebar.style.right = "0px";
+        candidateSidebar.style.right = "-250px";
+      }
+    }
+
+    // Update the user count based on currentData.rows length
+    function updateUserCount() {
+      if (currentData && currentData.rows) {
+        document.getElementById('userCountDisplay').textContent = currentData.rows.length;
+      } else {
+        document.getElementById('userCountDisplay').textContent = '0';
+      }
+    }
+    // Add this to your existing JavaScript code
+function animateUserCounts() {
+  const userCountContainer = document.querySelector('.user-count-container');
+  
+  // Add fade-in animation when updating counts
+  userCountContainer.style.opacity = '0';
+  
+  // Trigger reflow to ensure the animation works
+  void userCountContainer.offsetWidth;
+  
+  // Fade in the user count container
+  userCountContainer.style.opacity = '1';
+  userCountContainer.style.transition = 'opacity 0.8s ease-in-out';
+}
+  </script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-profile">
+      <img src="/Talentcornerlogo.jpg" alt="Talent Corner" class="profile-img"/>
+    </div>
+    <div class="sidebar-header">Talent Corner</div>
+    <div class="toggle-btn" onclick="toggleCandidateSidebar()">Candidate Data</div>
+    <div class="toggle-btn" onclick="toggleClientSidebar()">Franchises Data</div>
+    <a href="/logout" class="logout-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M10 2v2H4v16h6v2H2V2h8zm3.707 5.707L18.414 12l-4.707 4.293-1.414-1.414L15.586 12l-3.293-3.293 1.414-1.414z"/>
+      </svg>
+      Sign Out
+    </a>
+  </div>
+
+  <div class="candidate-sidebar" id="candidateSidebar">
+    <div class="sidebar-header-bar">
+      Candidate Data
+      <span class="close-btn" onclick="toggleCandidateSidebar()">✖</span>
+    </div>
+    <div class="sidebar-link" onclick="window.location.href='/datavisualization.html'">Data Visualization</div>
+    <div class="sidebar-link" onclick="window.location.href='dashboard.html'">Import Excel</div>
+    <div class="sidebar-link" onclick="window.location.href='imported_data.html'">Imported Data</div>
+    <div class="sidebar-link" onclick="window.location.href='/form1data.html'">Form1 Data</div>
+    <div class="sidebar-link" onclick="window.location.href='candidate_ranking.html'">Candidate's Ranking</div>
+    <div class="sidebar-link" onclick="window.location.href='AdminloginData.html'">Admin Login Data</div>
+  </div>
+
+  <div class="client-sidebar" id="clientSidebar">
+    <div class="sidebar-header-bar">
+      Franchises Data
+      <span class="close-btn" onclick="toggleClientSidebar()">✖</span>
+    </div>
+    <div class="sidebar-link active" onclick="window.location.href='/Franchisesignupdata.html'">Franchises SignUp Data</div>
+    <div class="sidebar-link" onclick="window.location.href='/client2'">Client 2</div>
+  </div>
+
+  <div class="content">
+    <div class="header-container">
+      <h1 id="pageHeader">Franchise Login Data</h1>
+      <div class="user-count-container">
+        <div class="user-count-card">
+          <div class="user-count-icon">👤</div>
+          <div class="user-count-info">
+            <div class="user-count-label">Total Users</div>
+            <div class="user-count-number" id="userCountDisplay">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="messageContainer"></div>
+    <div id="processing" style="display: none; text-align: center; margin-bottom: 10px;">
+      <span class="small-spinner"></span>
+      <span>Processing, please wait...</span>
+    </div>
+    <div id="tableContainer"></div>
+    <div id="paginationContainer" class="pagination"></div>
+    <div id="emailSection">
+      <button onclick="openAddModal()">Add User</button>
+      <button onclick="triggerDeleteSelected()">Delete Selected</button>
+      <button onclick="triggerDeleteAll()">Delete All</button>
+    </div>
+  </div>
+  
+  <div id="modifyModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModifyModal()">&times;</span>
+      <div class="modal-content-inner">
+        <h3 style="color: #54397e;">Modify User</h3>
+        <label for="modId">ID:</label>
+        <input type="text" id="modId" readonly />
+        <label for="modEmail">Email:</label>
+        <input type="text" id="modEmail" />
+        <label for="modOrganization">Organization Name:</label>
+        <input type="text" id="modOrganization" />
+      </div>
+      <div id="modalSpinner" style="display: none; text-align: center; margin-bottom: 10px;">
+        <span class="small-spinner"></span>
+        <span>Saving, please wait...</span>
+      </div>
+      <div class="modal-buttons">
+        <button onclick="closeModifyModal()">Cancel</button>
+        <button onclick="confirmModify()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddModal()">&times;</span>
+      <div class="modal-content-inner">
+        <h3 style="color: #54397e;">Add User</h3>
+        <label for="addEmail">Email:</label>
+        <input type="text" id="addEmail" />
+        <label for="addPassword">Password:</label>
+        <input type="password" id="addPassword" />
+        <label for="addOrganization">Organization Name:</label>
+        <input type="text" id="addOrganization" />
+      </div>
+      <div id="modalSpinner" style="display: none; text-align: center; margin-bottom: 10px;">
+        <span class="small-spinner"></span>
+        <span>Saving, please wait...</span>
+      </div>
+      <div class="modal-buttons">
+        <button onclick="closeAddModal()">Cancel</button>
+        <button onclick="confirmAdd()">Add User</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cancelDelete()">&times;</span>
+      <div class="modal-content-inner">
+        <h3>Confirm Deletion</h3>
+        <p>Do you really want to delete the selected users?</p>
+      </div>
+      <div class="modal-buttons">
+        <button onclick="cancelDelete()">Cancel</button>
+        <button onclick="confirmDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteAllModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('deleteAllModal').style.display='none'">&times;</span>
+      <h3>Confirm Delete All</h3>
+      <p>Are you sure you want to delete ALL users? This action cannot be undone.</p>
+      <div class="modal-buttons">
+        <button onclick="document.getElementById('deleteAllModal').style.display='none'">Cancel</button>
+        <button onclick="confirmDeleteAll()">Yes, Delete All</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

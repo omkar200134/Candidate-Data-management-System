@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Talent Corner - Candidate's Ranking Data</title>
+  <!-- Import Google Fonts for a modern look -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+  <style>
+    /* Base Styles */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      overflow-y: hidden;
+    }
+    #messageContainer {
+      margin: 10px 0;
+    }
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #54397e;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar-header {
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px 0;
+      background-color: #432c65;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .sidebar-link {
+      font-size: 16px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .sidebar-link.active {
+      background-color: #432c65;
+      border-left: 4px solid #ff4d4d;
+    }
+    .sidebar-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.02);
+    }
+    h3 {
+      color: #54397e;
+    }
+    .logout-btn {
+      background: #ff4d4d;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      justify-content: center;
+      margin-top: auto;
+      width: 100%;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .logout-btn:hover {
+      background: #c82333;
+    }
+    .logout-btn:active, button:active {
+      transform: scale(0.95);
+    }
+    .logout-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+    /* Content Area */
+    .content {
+      margin-left: 220px;
+      padding: 20px;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    /* Header Container & Fade Transitions */
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: opacity 1s ease;
+    }
+    /* Use a single hide rule for header/search containers */
+    .hide-header {
+      display: none !important;
+    }
+    /* Fade-in for header and table */
+    #headerCandidateRanking,
+    #tableContainer {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    table thead {
+      background-color: #54397e;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    table tr:hover {
+      background-color: #ddd;
+    }
+    /* Table Container */
+    #tableContainer {
+      max-height: 315px; 
+      overflow-y: scroll;
+      position: relative;
+      scrollbar-width: thin;
+      scrollbar-color: #54397e #f1f1f1;
+    }
+    /* WebKit Scrollbar Styling */
+    #tableContainer::-webkit-scrollbar {
+      width: 12px;
+      height: 10px;
+    }
+    #tableContainer::-webkit-scrollbar-thumb {
+      background-color: #54397e;
+      border-radius: 5px;
+    }
+    #tableContainer::-webkit-scrollbar-track {
+      background-color: #f1f1f1;
+    }
+    /* Sticky Action Column */
+    table thead th:last-child {
+      position: sticky;
+      top: 0;
+      right: 0;
+      background-color: #54397e;
+      z-index: 30;
+    }
+    table tbody td:last-child {
+      position: sticky;
+      right: 0;
+      background-color: white;
+      z-index: 1;
+    }
+    table tbody tr:nth-child(even) td:last-child {
+      background-color: #f2f2f2;
+    }
+    table tbody tr:nth-child(odd) td:last-child {
+      background-color: white;
+    }
+    table tbody tr:hover td:last-child {
+      background-color: #ddd;
+    }
+    /* Table Action Button */
+    .action-btn {
+      padding: 6px 12px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .action-btn:hover:not(:disabled) {
+      background-color: #432c65;
+      transform: scale(1.03);
+    }
+    .action-btn:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    /* Email Section Buttons */
+    #emailSection {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      text-align: center;
+    }
+    #emailSection button {
+      padding: 10px 20px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 0 5px;
+    }
+    #emailSection button:hover:not(:disabled) {
+      background-color: #432c65;
+      transform: scale(1.02);
+    }
+    #emailSection button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    /* Sidebars */
+    .candidate-sidebar, .client-sidebar {
+      position: fixed;
+      top: 0;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #3a2c5b;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+      transition: right 0.4s ease-in-out;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+      z-index: 30;
+    }
+    .sidebar-header-bar {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid white;
+      margin-bottom: 20px;
+    }
+    .close-btn {
+      cursor: pointer;
+      font-size: 20px;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: #ff4d4d;
+    }
+    .toggle-btn {
+      font-size: 16px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background-color: rgba(255, 255, 255, 0.2);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .toggle-btn:hover {
+      transform: scale(1.02);
+    }
+    /* Profile Image */
+    .sidebar-profile {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px 0;
+    }
+    .profile-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    /* Pagination */
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .pagination button {
+      padding: 8px 16px;
+      margin: 0 4px;
+      background-color: #54397e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .pagination button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .pagination-info {
+      display: inline-block;
+      margin: 0 20px;
+      font-size: 14px;
+    }
+    /* Spinner Animation */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .small-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #54397e;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+      animation: spin 1s linear infinite;
+    }
+    /* Headings */
+    h1 {
+      color: #54397e;
+      margin-top: 0;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    /* Message Styling */
+    .error-message {
+      color: #d8000c;
+      background-color: #ffbaba;
+      border: 1px solid #d8000c;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      clear: both;
+      font-weight: 500;
+    }
+    .success-message {
+      color: #2d862d;
+      background-color: #dff0d8;
+      border: 1px solid #2d862d;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      clear: both;
+      font-weight: 500;
+    }
+    .info-message {
+      color: #d8000c;
+      background-color: #ffbaba;
+      border: 1px solid #d8000c;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      clear: both;
+      font-weight: 500;
+    }
+    /* Modal Overlay */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+    /* Modal Content */
+    .modal-content {
+      background: #fff;
+      padding: 24px;
+      border-radius: 4px;
+      text-align: center;
+      width: 400px;
+      max-width: 90%;
+      max-height: 85vh;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                  0 3px 6px rgba(0, 0, 0, 0.23);
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+    }
+    .modal-content-inner {
+      max-height: calc(85vh - 100px);
+      overflow-y: auto;
+      margin-top: 20px;
+      padding-right: 8px;
+    }
+    .modal-content-inner::-webkit-scrollbar-track {
+      width: 6px;
+      background: #54397e;
+      border-radius: 3px;
+    }
+    .modal-content-inner::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    .modal-content-inner::-webkit-scrollbar- {
+      background: #54397e;
+      border-radius: 3px;
+    }
+    .modal-content label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #54397e;
+      text-align: left;
+    }
+    .modal-content input[type="text"],
+    .modal-content input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .modal-content input[type="text"]:focus,
+    .modal-content input[type="number"]:focus {
+      border-color: #54397e;
+      box-shadow: 0 0 5px rgba(84, 57, 126, 0.5);
+      outline: none;
+    }
+    .modal-buttons {
+      position: sticky;
+      bottom: 0;
+      background-color: #fefefe;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+    .modal-buttons button {
+      padding: 10px 20px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background-color 0.3s ease;
+    }
+    .modal-buttons button:hover {
+      background-color: #432c65;
+    }
+    .close {
+      position: absolute;
+      right: 25px;
+      top: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      z-index: 10;
+    }
+    .close:hover {
+      color: #54397e;
+    }
+    /* Sticky Email Status Column */
+    td.email-status {
+      position: sticky;
+      right: 80px;
+      background: white;
+      z-index: 2;
+    }
+    table thead th.email-status {
+      position: sticky;
+      right: 80px;
+      background-color: #54397e;
+      color: white;
+      z-index: 3;
+    }
+    table tbody tr:nth-child(even) td.email-status {
+      background-color: #f2f2f2;
+    }
+    table tbody tr:nth-child(odd) td.email-status {
+      background-color: white;
+    }
+    table tbody tr:hover td.email-status {
+      background-color: #ddd;
+    }
+    /* Search Container */
+    #searchContainer select,
+    #searchContainer button {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-right: 8px;
+      background-color: #fff;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    #searchContainer button {
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    #searchContainer button:hover {
+      background-color: #432c65;
+    }
+    #searchSubDomain:focus,
+    #searchDomain:focus {
+      border-color: #54397e;
+      box-shadow: 0 0 5px rgba(84, 57, 126, 0.5);
+      outline: none;
+    }
+    /* Fade-in transitions for header and table */
+    #headerCandidateRanking,
+    #tableContainer {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    /* Initially hide search, email, and processing sections */
+    #searchContainer,
+    #emailSection,
+    #processing {
+      display: none;
+    }
+    /* User Count Dashboard */
+    .user-count-container {
+      margin: 0;
+      display: flex;
+      gap: 20px;
+      margin-left: 30px;
+      transition: opacity 0.8s ease-in-out;
+      opacity: 0;
+    }
+    .user-count-card {
+      display: flex;
+      align-items: center;
+      background-color: white;
+      border-left: 5px solid #54397e;
+      border-radius: 8px;
+      padding: 10px 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      width: fit-content;
+      min-width: 180px;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .user-count-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    .user-count-icon {
+      font-size: 22px;
+      margin-right: 15px;
+      background-color: #f0ebf8;
+      color: #54397e;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .user-count-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-count-label {
+      font-size: 12px;
+      color: #666;
+    }
+    .user-count-number {
+      font-size: 20px;
+      font-weight: bold;
+      color: #54397e;
+      transition: color 0.3s ease;
+    }
+    .user-count-card:hover .user-count-number {
+      color: #4a90e2;
+    }
+    /* Header Container for Candidate Ranking page */
+    #headerCandidateRankingContainer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: opacity 1s ease;
+    }
+    
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-profile">
+      <img src="/Talentcornerlogo.jpg" alt="Talent Corner" class="profile-img"/>
+    </div>
+    <div class="sidebar-header">Talent Corner</div>
+    <div class="toggle-btn" onclick="toggleCandidateSidebar()">Candidate Data</div>
+    <div class="toggle-btn" onclick="toggleClientSidebar()">Franchises Data</div>
+    <a href="/logout" class="logout-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M10 2v2H4v16h6v2H2V2h8zm3.707 5.707L18.414 12l-4.707 4.293-1.414-1.414L15.586 12l-3.293-3.293 1.414-1.414z"/>
+      </svg>
+      Sign Out
+    </a>
+  </div>
+  <!-- Candidate Data Sidebar -->
+  <div class="candidate-sidebar" id="candidateSidebar">
+    <div class="sidebar-header-bar">
+      Candidate Data
+      <span class="close-btn" onclick="toggleCandidateSidebar()">✖</span>
+    </div>
+    <div class="sidebar-link" onclick="window.location.href='/datavisualization.html'">Data Visualization</div>
+    <div class="sidebar-link" onclick="window.location.href='dashboard.html'">Import Excel</div>
+    <div class="sidebar-link" onclick="window.location.href='imported_data.html'">Imported Data</div>
+    <div class="sidebar-link" onclick="window.location.href='/form1data.html'">Form1 Data</div>
+    <div class="sidebar-link active" onclick="window.location.href='candidate_ranking.html'">Candidate's Ranking</div>
+    <div class="sidebar-link" onclick="window.location.href='/AdminloginData.html'">Admin Login Data</div>
+  </div>
+  <!-- Client Data Sidebar -->
+  <div class="client-sidebar" id="clientSidebar">
+    <div class="sidebar-header-bar">
+      Franchises Data
+      <span class="close-btn" onclick="toggleClientSidebar()">✖</span>
+    </div>
+    <div class="sidebar-link" onclick="window.location.href='/Franchisesignupdata.html'">Franchises SignUp Data</div>
+    <div class="sidebar-link" onclick="window.location.href='/client2'">Client 2</div>
+  </div>
+  <div class="content">
+    <!-- Header Container -->
+    <div id="headerCandidateRankingContainer" class="header-container">
+      <h1 id="headerCandidateRanking">Candidate's Ranking Data</h1>
+      <div class="user-count-container">
+        <div class="user-count-card">
+          <div class="user-count-icon">👤</div>
+          <div class="user-count-info">
+            <div class="user-count-label">Total Candidates</div>
+            <div class="user-count-number" id="userCountDisplay">0</div>
+          </div>
+        </div>
+        <div class="user-count-card">
+          <div class="user-count-icon">✉️</div>
+          <div class="user-count-info">
+            <div class="user-count-label">Emails Sent</div>
+            <div class="user-count-number" id="emailSentCountDisplay">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="messageContainer"></div>
+    <div id="processing" style="text-align: center; margin-bottom: 10px;">
+      <span class="small-spinner"></span>
+      <span>Processing, please wait...</span>
+    </div>
+    <div id="searchContainer">
+      <label for="searchDomain">Domain:</label>
+      <select id="searchDomain">
+        <option value="">All</option>
+      </select>
+      <label for="searchSubDomain">Sub Domain:</label>
+      <select id="searchSubDomain">
+        <option value="">All</option>
+      </select>
+      <button onclick="applyFilter()">Search</button>
+      <button onclick="clearFilter()">Clear</button>
+    </div>
+    <div id="tableContainer"></div>
+    <div id="paginationContainer" class="pagination"></div>
+    <div id="emailSection">
+      <button onclick="triggerSendEmailForCandidateRanking()">Send Email</button>
+      <button onclick="triggerDeleteSelected()">Delete Selected</button>
+      <button onclick="triggerDeleteAll()">Delete All</button>
+    </div>
+  </div>
+  <!-- Modify Modal -->
+  <div id="modifyModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModifyModal()">&times;</span>
+      <div class="modal-content-inner">
+        <h3>Modify Record</h3>
+        <label for="modId">ID:</label>
+        <input type="text" id="modId" readonly />
+        <label for="modRank">Rank:</label>
+        <input type="text" id="modRank" disabled />
+        <label for="modTimestamp">Timestamp:</label>
+        <input type="text" id="modTimestamp" disabled />
+        <label for="modFullName">Full Name:</label>
+        <input type="text" id="modFullName" />
+        <label for="modEmail">Email:</label>
+        <input type="text" id="modEmail" />
+        <label for="modPhone">Phone:</label>
+        <input type="text" id="modPhone" />
+        <label for="modDomain">Domain:</label>
+        <input type="text" id="modDomain" />
+        <label for="modSubDomain">Sub-Domain:</label>
+        <input type="text" id="modSubDomain" />
+        <label for="modMarks">Marks:</label>
+        <input type="number" id="modMarks" />
+        <label for="modCompletion">Completion of MCQ:</label>
+        <input type="number" id="modCompletion" />
+        <label for="modDate">Date:</label>
+        <input type="number" id="modDate" />
+        <label for="modMonth">Month:</label>
+        <input type="text" id="modMonth" />
+        <label for="modYear">Year:</label>
+        <input type="number" id="modYear" />
+        <label for="modEmailStatus">Email Status (0 = Pending, 1 = Sent, 2 = Rejected):</label>
+        <input type="number" id="modEmailStatus" min="0" max="2" />
+      </div>
+      <div id="modalSpinner" style="display: none; text-align: center; margin-bottom: 10px;">
+        <span class="small-spinner"></span>
+        <span>Saving, please wait...</span>
+      </div>
+      <div class="modal-buttons">
+        <button onclick="closeModifyModal()">Cancel</button>
+        <button onclick="confirmModify()">Save</button>
+      </div>
+    </div>
+  </div>
+  <!-- Confirmation Modal for Deletion -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cancelDelete()">&times;</span>
+      <div class="modal-content-inner">
+        <h3>Confirm Deletion</h3>
+        <p>Do you really want to delete the selected records?</p>
+      </div>
+      <div class="modal-buttons">
+        <button onclick="cancelDelete()">Cancel</button>
+        <button onclick="confirmDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+  <!-- Delete All Confirmation Modal -->
+  <div id="deleteAllModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeDeleteAllModal()">&times;</span>
+      <h3>Confirm Delete All</h3>
+      <p>Are you sure you want to delete ALL candidate ranking records? This action cannot be undone.</p>
+      <div class="modal-buttons">
+        <button onclick="closeDeleteAllModal()">Cancel</button>
+        <button onclick="confirmDeleteAll()">Yes, Delete All</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let currentData = null;
+    let currentPage = 1;
+    const ROWS_PER_PAGE = 50;
+    let modifyRecordId = null;
+    let selectedDomain = "";
+    let selectedSubDomain = "";
+
+    
+    window.onload = function() {
+      loadData(false);
+      
+      // Fade in header and table elements
+      const header = document.getElementById('headerCandidateRanking');
+      const table = document.getElementById('tableContainer');
+      header.style.opacity = 1;
+      setTimeout(() => {
+        table.style.opacity = 1;
+      }, 500);
+      
+      setInterval(() => loadData(true), 30000);
+    };
+    
+    function showCustomMessage(message, type) {
+      const messageContainer = document.getElementById('messageContainer');
+      const headerContainer = document.getElementById('headerCandidateRankingContainer');
+      const searchContainer = document.getElementById('searchContainer');
+      
+      // Hide header and search containers
+      if (headerContainer) {
+        headerContainer.classList.add('hide-header');
+      }
+      if (searchContainer) {
+        searchContainer.classList.add('hide-header');
+      }
+      
+      messageContainer.innerHTML = message;
+      messageContainer.className = 
+        type === 'error' ? 'error-message' :
+        type === 'success' ? 'success-message' : 'info-message';
+      messageContainer.style.display = 'block';
+      
+      messageContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      setTimeout(() => {
+        messageContainer.style.display = 'none';
+        messageContainer.innerHTML = '';
+        messageContainer.className = '';
+        if (headerContainer) {
+          headerContainer.classList.remove('hide-header');
+        }
+        if (searchContainer) {
+          searchContainer.classList.remove('hide-header');
+        }
+      }, 4000);
+    }
+    
+    function showProcessing() {
+  const spinner = document.getElementById('processing');
+  const headerContainer = document.getElementById('headerCandidateRankingContainer');
+  const searchContainer = document.getElementById('searchContainer');
+  
+  spinner.style.display = 'block';
+  if (headerContainer) {
+    headerContainer.classList.add('hide-header');
+  }
+  if (searchContainer) {
+    searchContainer.classList.add('hide-header');
+  }
+  spinner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+    
+    function hideProcessing() {
+      const spinner = document.getElementById('processing');
+      const headerContainer = document.getElementById('headerCandidateRankingContainer');
+      const searchContainer = document.getElementById('searchContainer');
+      
+      spinner.style.display = 'none';
+      if (headerContainer && document.getElementById('messageContainer').style.display !== 'block') {
+        headerContainer.classList.remove('hide-header');
+      }
+      if (searchContainer && document.getElementById('messageContainer').style.display !== 'block') {
+        searchContainer.classList.remove('hide-header');
+      }
+    }
+    
+    function loadData(showSpinner = true) {
+      if (showSpinner) showProcessing();
+      
+      document.getElementById('emailSection').style.display = 'none';
+      document.getElementById('searchContainer').style.display = 'none';
+      
+      fetch('/candidate-ranking')
+        .then(response => response.json())
+        .then(data => {
+          currentData = data;
+          populateSearchFilters();
+          displayData(1);
+          if (showSpinner) hideProcessing();
+          document.getElementById('emailSection').style.display = 'block';
+          document.getElementById('searchContainer').style.display = 'block';
+        })
+        .catch(error => {
+          if (showSpinner) hideProcessing();
+          showCustomMessage("Error loading data: " + (error.message || error), 'error');
+        });
+    }
+    
+    function displayData(page) {
+      let filteredRows = currentData.rows;
+      if (selectedDomain || selectedSubDomain) {
+        filteredRows = filteredRows.filter(row => {
+          let match = true;
+          if (selectedDomain) match = match && (row.Domain === selectedDomain);
+          if (selectedSubDomain) match = match && (row.Sub_Domain === selectedSubDomain);
+          return match;
+        });
+      }
+      
+      currentPage = page;
+      const startIndex = (page - 1) * ROWS_PER_PAGE;
+      const paginatedRows = filteredRows.slice(startIndex, startIndex + ROWS_PER_PAGE);
+      
+      let tableHTML = '<table><thead><tr>';
+      tableHTML += '<th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" /></th>';
+      
+      const displayHeaders = [
+        "id", "Rank", "Timestamp", "Full_Name", "Email", "Phone_No", 
+        "Domain", "Sub_Domain", "Marks", "Completion_of_MCQ", 
+        "Date", "Month", "Year", "email_status"
+      ];
+      
+      displayHeaders.forEach(header => {
+        if (header === "email_status") {
+          tableHTML += `<th class="email-status">${header}</th>`;
+        } else {
+          tableHTML += `<th>${header}</th>`;
+        }
+      });
+      
+      tableHTML += '<th>Actions</th></tr></thead><tbody>';
+      
+      paginatedRows.forEach(row => {
+        const recordId = row.id;
+        const checkboxId = "checkbox_" + recordId;
+        tableHTML += `<tr onclick="rowClicked(event, '${checkboxId}')">`;
+        tableHTML += `<td><input type="checkbox" id="${checkboxId}" data-recordid="${recordId}" class="emailCheckbox" onclick="event.stopPropagation();"/></td>`;
+        
+        displayHeaders.forEach(header => {
+          if (header === "email_status") {
+            tableHTML += `<td class="email-status">${formatEmailStatus(row[header] !== undefined ? row[header] : 0)}</td>`;
+          } else {
+            tableHTML += `<td>${row[header] !== undefined ? row[header] : ""}</td>`;
+          }
+        });
+        
+        tableHTML += `<td onclick="event.stopPropagation();">
+                        <button class="action-btn" onclick='openModifyModal(${recordId}, ${JSON.stringify(row).replace(/"/g, '&quot;')})'>
+                          Modify
+                        </button>
+                      </td>`;
+        tableHTML += '</tr>';
+      });
+      
+      tableHTML += '</tbody></table>';
+      document.getElementById('tableContainer').innerHTML = tableHTML;
+      updatePagination(filteredRows);
+      updateUserCounts();
+    }
+    
+    function rowClicked(event, checkboxId) {
+      if (event.target.tagName.toLowerCase() === 'input') return;
+      const checkbox = document.getElementById(checkboxId);
+      if (checkbox) checkbox.checked = !checkbox.checked;
+    }
+    
+    function toggleSelectAll(source) {
+      const checkboxes = document.querySelectorAll('.emailCheckbox');
+      checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+    
+    function updatePagination(filteredRows) {
+      const totalPages = Math.ceil(filteredRows.length / ROWS_PER_PAGE);
+      const paginationContainer = document.getElementById('paginationContainer');
+      let paginationHTML = `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+      paginationHTML += `<span class="pagination-info">Page ${currentPage} of ${totalPages}</span>`;
+      paginationHTML += `<button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Next</button>`;
+      paginationContainer.innerHTML = paginationHTML;
+    }
+    
+    function changePage(page) { 
+      displayData(page); 
+    }
+    
+    function openModifyModal(recordId, rowData) {
+      modifyRecordId = recordId;
+      enableModalInputs();
+      hideModalSpinner();
+      
+      document.getElementById('modId').value = rowData.id;
+      document.getElementById('modRank').value = rowData.Rank || "";
+      document.getElementById('modTimestamp').value = rowData.Timestamp || "";
+      document.getElementById('modFullName').value = rowData.Full_Name || "";
+      document.getElementById('modEmail').value = rowData.Email || "";
+      document.getElementById('modPhone').value = rowData.Phone_No || "";
+      document.getElementById('modDomain').value = rowData.Domain || "";
+      document.getElementById('modSubDomain').value = rowData.Sub_Domain || "";
+      document.getElementById('modMarks').value = rowData.Marks || "";
+      document.getElementById('modCompletion').value = rowData.Completion_of_MCQ || "";
+      document.getElementById('modDate').value = rowData.Date || "";
+      document.getElementById('modMonth').value = rowData.Month || "";
+      document.getElementById('modYear').value = rowData.Year || "";
+      document.getElementById('modEmailStatus').value = rowData.email_status !== undefined ? rowData.email_status : 0;
+      
+      document.getElementById('modifyModal').style.display = 'flex';
+    }
+    
+    function closeModifyModal() {
+      document.getElementById('modifyModal').style.display = 'none';
+      modifyRecordId = null;
+      enableModalInputs();
+      hideModalSpinner();
+    }
+    
+    function disableModalInputs() {
+      ['modFullName', 'modEmail', 'modPhone', 'modDomain', 'modSubDomain', 'modMarks', 'modCompletion', 'modDate', 'modMonth', 'modYear', 'modEmailStatus'].forEach(id => {
+        document.getElementById(id).disabled = true;
+      });
+      const saveBtn = document.querySelector('.modal-buttons button:last-child');
+      if (saveBtn) saveBtn.disabled = true;
+    }
+    
+    function enableModalInputs() {
+      ['modFullName', 'modEmail', 'modPhone', 'modDomain', 'modSubDomain', 'modMarks', 'modCompletion', 'modDate', 'modMonth', 'modYear', 'modEmailStatus'].forEach(id => {
+        document.getElementById(id).disabled = false;
+      });
+      const saveBtn = document.querySelector('.modal-buttons button:last-child');
+      if (saveBtn) saveBtn.disabled = false;
+    }
+    
+    function showModalSpinner() {
+      const spinner = document.getElementById('modalSpinner');
+      if (spinner) spinner.style.display = 'block';
+    }
+    
+    function hideModalSpinner() {
+      const spinner = document.getElementById('modalSpinner');
+      if (spinner) spinner.style.display = 'none';
+    }
+    
+    function confirmModify() {
+      const dataToSend = {
+        id: modifyRecordId,
+        fullName: document.getElementById('modFullName').value,
+        email: document.getElementById('modEmail').value,
+        phone: document.getElementById('modPhone').value,
+        domain: document.getElementById('modDomain').value,
+        subDomain: document.getElementById('modSubDomain').value,
+        marks: document.getElementById('modMarks').value,
+        completion_of_MCQ: document.getElementById('modCompletion').value,
+        date: document.getElementById('modDate').value,
+        month: document.getElementById('modMonth').value,
+        year: document.getElementById('modYear').value,
+        emailStatus: parseInt(document.getElementById('modEmailStatus').value)
+      };
+      
+      disableModalInputs();
+      showModalSpinner();
+      
+      fetch('/candidate-ranking/modify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSend)
+      })
+      .then(response => response.json())
+      .then(result => {
+        hideModalSpinner();
+        enableModalInputs();
+        if (result.success) {
+          showCustomMessage(result.message, 'success');
+          closeModifyModal();
+          loadData();
+        } else {
+          showCustomMessage(result.error, 'error');
+        }
+      })
+      .catch(error => {
+        hideModalSpinner();
+        enableModalInputs();
+        showCustomMessage(error.message || error, 'error');
+      });
+    }
+    
+    function triggerSendEmailForCandidateRanking() {
+      const messageContainer = document.getElementById('messageContainer');
+      messageContainer.innerHTML = '';
+      messageContainer.style.display = 'none';
+      
+      showProcessing();
+      
+      fetch('/candidate-ranking/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: selectedDomain, subDomain: selectedSubDomain })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          showCustomMessage(result.message, 'success');
+          loadData(true);
+        } else {
+          showCustomMessage(result.error, 'error');
+          hideProcessing();
+        }
+      })
+      .catch(error => {
+        hideProcessing();
+        showCustomMessage(error.message || error, 'error');
+      });
+    }
+    
+    function triggerDeleteSelected() {
+      const checkboxes = document.querySelectorAll('.emailCheckbox:checked');
+      if (checkboxes.length === 0) {
+        showCustomMessage("No rows selected.", "error");
+        return;
+      }
+      openConfirmDeleteModal();
+    }
+    
+    function openConfirmDeleteModal() {
+      document.getElementById('confirmModal').style.display = 'flex';
+    }
+    
+    function confirmDelete() {
+      document.getElementById('confirmModal').style.display = 'none';
+      const checkboxes = document.querySelectorAll('.emailCheckbox:checked');
+      let idsToDelete = [];
+      checkboxes.forEach(cb => {
+        const recordId = parseInt(cb.getAttribute('data-recordid'));
+        if (!isNaN(recordId)) idsToDelete.push(recordId);
+      });
+      showProcessing();
+      fetch('/candidate-ranking/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: idsToDelete })
+      })
+      .then(response => response.json())
+      .then(result => {
+        hideProcessing();
+        if(result.success) {
+          showCustomMessage(result.message, "success");
+          loadData();
+        } else {
+          showCustomMessage(result.error, "error");
+        }
+      })
+      .catch(error => {
+        hideProcessing();
+        showCustomMessage(error.message || error, "error");
+      });
+    }
+    
+    function cancelDelete() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+    
+    function triggerDeleteAll() {
+      document.getElementById('deleteAllModal').style.display = 'flex';
+    }
+    
+    function closeDeleteAllModal() {
+      document.getElementById('deleteAllModal').style.display = 'none';
+    }
+    
+    function confirmDeleteAll() {
+      closeDeleteAllModal();
+      showProcessing();
+      fetch('/candidate-ranking/deleteAll', { method: 'DELETE' })
+      .then(response => response.text())
+      .then(message => {
+        hideProcessing();
+        showCustomMessage(message, "success");
+        loadData();
+      })
+      .catch(error => {
+        hideProcessing();
+        showCustomMessage(error.message || error, "error");
+      });
+    }
+    
+    function toggleCandidateSidebar() {
+      var candidateSidebar = document.getElementById("candidateSidebar");
+      var clientSidebar = document.getElementById("clientSidebar");
+      if (candidateSidebar && clientSidebar) {
+        if (candidateSidebar.style.right === "0px") {
+          candidateSidebar.style.right = "-250px";
+        } else {
+          candidateSidebar.style.right = "0px";
+          clientSidebar.style.right = "-250px";
+        }
+      }
+    }
+    
+    function toggleClientSidebar() {
+      var clientSidebar = document.getElementById("clientSidebar");
+      var candidateSidebar = document.getElementById("candidateSidebar");
+      if (clientSidebar && candidateSidebar) {
+        if (clientSidebar.style.right === "0px") {
+          clientSidebar.style.right = "-250px";
+        } else {
+          clientSidebar.style.right = "0px";
+          candidateSidebar.style.right = "-250px";
+        }
+      }
+    }
+    
+    function populateSearchFilters() {
+      if (!currentData || !currentData.rows) return;
+      
+      const domainSet = new Set();
+      const subDomainSet = new Set();
+      
+      currentData.rows.forEach(row => {
+        if (row.Domain) domainSet.add(row.Domain);
+        if (row.Sub_Domain) subDomainSet.add(row.Sub_Domain);
+      });
+      
+      const searchDomain = document.getElementById('searchDomain');
+      const searchSubDomain = document.getElementById('searchSubDomain');
+      
+      searchDomain.innerHTML = '<option value="">All</option>';
+      searchSubDomain.innerHTML = '<option value="">All</option>';
+      
+      domainSet.forEach(domain => {
+        const option = document.createElement('option');
+        option.value = domain;
+        option.textContent = domain;
+        searchDomain.appendChild(option);
+      });
+      
+      subDomainSet.forEach(subDomain => {
+        const option = document.createElement('option');
+        option.value = subDomain;
+        option.textContent = subDomain;
+        searchSubDomain.appendChild(option);
+      });
+    }
+    
+    function applyFilter() {
+      selectedDomain = document.getElementById('searchDomain').value;
+      selectedSubDomain = document.getElementById('searchSubDomain').value;
+      displayData(1);
+    }
+    
+    function clearFilter() {
+      selectedDomain = "";
+      selectedSubDomain = "";
+      document.getElementById('searchDomain').value = "";
+      document.getElementById('searchSubDomain').value = "";
+      displayData(1);
+    }
+    
+    function formatEmailStatus(status) {
+      if (status === 0 || status === "0") {
+        return '<span style="color: orange;font-weight: bold;">Pending</span>';
+      } else if (status === 1 || status === "1") {
+        return '<span style="color: green;font-weight: bold;">Sent</span>';
+      } else if (status === 2 || status === "2" || status === "rejected") {
+        return '<span style="color: red;font-weight: bold;">Rejected</span>';
+      }
+      return status;
+    }
+    
+    // Animation functions for user count and search containers with delay
+    function animateUserCounts() {
+      const userCountContainer = document.querySelector('.user-count-container');
+      if (!userCountContainer) return;
+      // Add a delay of 300ms before animating
+      setTimeout(() => {
+        userCountContainer.style.opacity = '0';
+        void userCountContainer.offsetWidth;
+        userCountContainer.style.opacity = '1';
+      }, 300);
+    }
+    
+    function animateSearchContainer() {
+      const searchContainer = document.getElementById('searchContainer');
+      if (!searchContainer) return;
+      searchContainer.style.opacity = '0';
+      void searchContainer.offsetWidth;
+      searchContainer.style.opacity = '1';
+    }
+    
+    function updateUserCounts() {
+      if (currentData && currentData.rows) {
+        document.getElementById('userCountDisplay').innerText = currentData.rows.length;
+        let emailSentCount = currentData.rows.filter(row => Number(row.email_status) === 1).length;
+        document.getElementById('emailSentCountDisplay').innerText = emailSentCount;
+        animateUserCounts();
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const style = document.createElement('style');
+      style.textContent = `
+        #searchContainer {
+          opacity: 0;
+          transition: opacity 0.8s ease-in-out;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      setTimeout(() => {
+        const searchContainer = document.getElementById('searchContainer');
+        if (searchContainer) {
+          searchContainer.style.opacity = '1';
+        }
+      }, 800);
+    });
+  </script>
+</body>
+</html>

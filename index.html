@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <title>Talent Corner - Admin Login page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: auto;
+    }
+    .container {
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      max-width: 95%;
+      text-align: center;
+      position: relative;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .scale-out {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    h1 {
+      color: #54397e;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 1.5rem;
+    }
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 24px;
+      font-size: 16px;
+      text-align: center;
+    }
+    .input-field:focus {
+      border-color: #54397e;
+      box-shadow: 0 0 5px rgba(84, 57, 126, 0.5);
+      outline: none;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 24px;
+      background-color: #54397e;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+    .submit-btn:hover:not(:disabled) {
+      background-color: #432c65;
+    }
+    .submit-btn:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    .spinner {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(84, 57, 126, 0.2);
+      border-top: 4px solid #54397e;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .error-message {
+      color: #d8000c;
+      background-color: #ffbaba;
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 14px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .password-container {
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 46%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 22px;
+      color: #54397e;
+      user-select: none;
+    }
+    .logo-img {
+      width: 80px;
+      height: auto;
+      display: block;
+      margin: 0 auto 15px;
+    }
+    .form-disabled {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="login-container">
+    <img src="/Talentcornerlogo.jpg" alt="Talent Corner" class="logo-img" />
+    <h1>Admin Login</h1>
+    <p>Please enter your admin credentials.</p>
+    <div id="error-message" class="error-message"></div>
+    <form id="myForm" method="post" action="/login" novalidate>
+      <input type="email" class="input-field" name="email" id="email" placeholder="Email Address" required>
+      <div class="password-container">
+        <input type="password" name="password" id="password" class="input-field" placeholder="Enter your Password" required>
+        <i id="togglePassword" class="material-icons toggle-password" onclick="togglePasswordVisibility()">visibility</i>
+      </div>
+      <input type="submit" id="signupButton" value="Login" class="submit-btn">
+    </form>
+    <div class="spinner" id="spinner"></div>
+  </div>
+  
+  <script>
+    // Toggle password visibility
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('togglePassword');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.textContent = 'visibility_off';
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.textContent = 'visibility';
+      }
+    }
+    
+    // Disable/enable form elements
+    function disableFormElements(disable) {
+      const form = document.getElementById('myForm');
+      const formElements = form.elements;
+      for (let i = 0; i < formElements.length; i++) {
+        formElements[i].disabled = disable;
+      }
+      document.getElementById('togglePassword').style.pointerEvents = disable ? 'none' : 'auto';
+      if (disable) {
+        form.classList.add('form-disabled');
+      } else {
+        form.classList.remove('form-disabled');
+      }
+    }
+    
+    // Form submission with AJAX
+    document.getElementById('myForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      var emailInput = document.getElementById('email');
+      var passwordInput = document.getElementById('password');
+      var email = emailInput.value.trim();
+      var password = passwordInput.value.trim();
+      
+      console.log("Email value:", email);
+      console.log("Password value:", password);
+      
+      if (email === "" || password === "") {
+        document.getElementById('error-message').innerText = 'Email and password are required.';
+        document.getElementById('error-message').style.display = 'block';
+        return;
+      }
+      
+      document.getElementById('error-message').style.display = 'none';
+      document.getElementById('spinner').style.display = 'block';
+      disableFormElements(true);
+      
+      var formData = new URLSearchParams();
+      formData.append('email', email);
+      formData.append('password', password);
+      
+      fetch('/login', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        if (data.success) {
+          // Keep spinner visible for 3 seconds then apply fade-out transition
+          setTimeout(function() {
+            const container = document.getElementById('login-container');
+            container.classList.add('scale-out');
+            // Redirect after fade-out transition (0.4s)
+            setTimeout(function() {
+              window.location.href = '/datavisualization.html';
+            }, 400);
+          }, 2000);
+        } else {
+          document.getElementById('spinner').style.display = 'none';
+          disableFormElements(false);
+          document.getElementById('error-message').innerText = data.error || 'Login failed. Please try again.';
+          document.getElementById('error-message').style.display = 'block';
+        }
+      })
+      .catch(function(error) {
+        console.error('Error:', error);
+        document.getElementById('spinner').style.display = 'none';
+        disableFormElements(false);
+        document.getElementById('error-message').innerText = 'An error occurred. Please try again.';
+        document.getElementById('error-message').style.display = 'block';
+      });
+    });
+    
+    // Mobile device input adjustments
+    function isMobileDevice() {
+      return /Mobi|Android/i.test(navigator.userAgent);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+      const formElements = document.getElementById('myForm').elements;
+      Array.from(formElements).forEach(el => {
+        if (el.tagName.toLowerCase() === 'input') {
+          el.addEventListener('focus', function () {
+            if (isMobileDevice()) {
+              el.setAttribute('readonly', 'readonly');
+              setTimeout(() => {
+                el.removeAttribute('readonly');
+              }, 50);
+            }
+          });
+          el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              const index = Array.from(formElements).indexOf(el);
+              let hasNextInput = false;
+              for (let i = index + 1; i < formElements.length; i++) {
+                if (formElements[i].tagName.toLowerCase() !== 'button') {
+                  hasNextInput = true;
+                  break;
+                }
+              }
+              if (hasNextInput) {
+                e.preventDefault();
+                if (isMobileDevice()) {
+                  el.blur();
+                } else {
+                  for (let i = index + 1; i < formElements.length; i++) {
+                    if (formElements[i].tagName.toLowerCase() !== 'button') {
+                      formElements[i].focus();
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Talent Corner - Form1 Data</title>
+  <!-- Import Google Fonts for a modern look -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+  <style>
+    /* Base Styles */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      overflow-y: hidden;
+    }
+    #messageContainer {
+      margin: 10px 0;
+    }
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #54397e;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar-header {
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px 0;
+      background-color: #432c65;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .sidebar-link {
+      font-size: 16px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .sidebar-link.active {
+      background-color: #432c65;
+      border-left: 4px solid #ff4d4d;
+    }
+    .sidebar-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.02);
+    }
+    h3 {
+      color: #54397e;
+    }
+    /* Logout Button */
+    .logout-btn {
+      background: #ff4d4d;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      justify-content: center;
+      margin-top: auto;
+      width: 100%;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .logout-btn:hover {
+      background: #c82333;
+    }
+    .logout-btn:active, button:active {
+      transform: scale(0.95);
+    }
+    .logout-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+    /* Content Area */
+    .content {
+      margin-left: 220px;
+      padding: 20px;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    /* Header Container for title and user counts */
+    #headerContainer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    /* Headings */
+    h1 {
+      color: #54397e;
+      margin-top: 0px;
+      opacity: 0; /* Start hidden for fade in */
+      transition: opacity 1.0s ease;
+    }
+    /* User Count Dashboard */
+    .user-count-container {
+      opacity: 0; /* Start hidden for fade in */
+      transition: opacity 1.0s ease;
+      display: flex;
+      gap: 20px;
+    }
+    .user-count-card {
+      display: flex;
+      align-items: center;
+      background-color: white;
+      border-left: 5px solid #54397e;
+      border-radius: 8px;
+      padding: 10px 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      width: fit-content;
+      min-width: 180px;
+    }
+    .user-count-icon {
+      font-size: 22px;
+      margin-right: 15px;
+      background-color: #f0ebf8;
+      color: #54397e;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .user-count-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-count-label {
+      font-size: 12px;
+      color: #666;
+    }
+    .user-count-number {
+      font-size: 20px;
+      font-weight: bold;
+      color: #54397e;
+    }
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    table thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background-color: #54397e;
+      color: white;
+    }
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    table tr:hover {
+      background-color: #ddd;
+    }
+    /* Table Container with Always-Visible Vertical Scrollbar */
+    #tableContainer {
+      max-height: 315px;
+      overflow-y: scroll;
+      position: relative;
+      scrollbar-width: thin;
+      scrollbar-color: #54397e #f1f1f1;
+      opacity: 0; /* Start hidden for fade in */
+      transition: opacity 1.0s ease;
+    }
+    /* WebKit Scrollbar Styling for Table Container */
+    #tableContainer::-webkit-scrollbar {
+      width: 12px;
+      height: 10px;
+    }
+    #tableContainer::-webkit-scrollbar-thumb {
+      background-color: #54397e;
+      border-radius: 5px;
+    }
+    #tableContainer::-webkit-scrollbar-track {
+      background-color: #f1f1f1;
+    }
+    /* Table Action Button */
+    .action-btn {
+      padding: 6px 12px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .action-btn:hover:not(:disabled) {
+      background-color: #432c65;
+      transform: scale(1.03);
+    }
+    .action-btn:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    /* Email Section Buttons */
+    #emailSection {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      text-align: center;
+    }
+    #emailSection button {
+      padding: 10px 20px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 0 5px;
+    }
+    #emailSection button:hover:not(:disabled) {
+      background-color: #432c65;
+      transform: scale(1.02);
+    }
+    #emailSection button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    /* Sidebars for Candidate and Client Data */
+    .candidate-sidebar, .client-sidebar {
+      position: fixed;
+      top: 0;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #3a2c5b;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+      transition: right 0.4s ease-in-out;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+      z-index: 3;
+    }
+    .sidebar-header-bar {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid white;
+      margin-bottom: 20px;
+    }
+    .close-btn {
+      cursor: pointer;
+      font-size: 20px;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: #ff4d4d;
+    }
+    .toggle-btn {
+      font-size: 16px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background-color: rgba(255, 255, 255, 0.2);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .toggle-btn:hover {
+      transform: scale(1.02);
+    }
+    /* Profile Image */
+    .sidebar-profile {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px 0;
+    }
+    .profile-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .pagination button {
+      padding: 8px 16px;
+      margin: 0 4px;
+      background-color: #54397e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .pagination button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .pagination-info {
+      display: inline-block;
+      margin: 0 20px;
+      font-size: 14px;
+    }
+    /* Spin Animation */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Spinner */
+    .small-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #54397e;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+      animation: spin 1s linear infinite;
+    }
+    /* Unified message styling */
+    .error-message, .success-message, .info-message {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      clear: both;
+      font-weight: 500;
+    }
+    .error-message {
+      color: #d8000c;
+      background-color: #ffbaba;
+      border: 1px solid #d8000c;
+    }
+    .success-message {
+      color: #2d862d;
+      background-color: #dff0d8;
+      border: 1px solid #2d862d;
+    }
+    .info-message {
+      color: #d8000c;
+      background-color: #ffbaba;
+      border: 1px solid #d8000c;
+    }
+    /* Modal Overlay */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+    /* Modal Content */
+    .modal-content {
+      background: #fff;
+      padding: 24px;
+      border-radius: 4px;
+      text-align: center;
+      width: 400px;
+      max-width: 90%;
+      max-height: 85vh;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                  0 3px 6px rgba(0, 0, 0, 0.23);
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+    }
+    /* Modal Scrollable Inner Content */
+    .modal-content-inner {
+      max-height: calc(85vh - 100px);
+      overflow-y: auto;
+      margin-top: 20px;
+      padding-right: 8px;
+    }
+    .modal-content-inner::-webkit-scrollbar-track {
+      width: 6px;
+    }
+    .modal-content-inner::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    .modal-content-inner::-webkit-scrollbar-thumb {
+      background: #54397e;
+      border-radius: 3px;
+    }
+    /* Modal Form Fields */
+    .modal-content label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #54397e;
+      text-align: left;
+    }
+    .modal-content input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .modal-content input[type="text"]:focus {
+      border-color: #54397e;
+      box-shadow: 0 0 5px rgba(84, 57, 126, 0.5);
+      outline: none;
+    }
+    /* Modal Buttons Container */
+    .modal-buttons {
+      position: sticky;
+      bottom: 0;
+      background-color: #fefefe;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+    .modal-buttons button {
+      padding: 10px 20px;
+      background-color: #54397e;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background-color 0.3s ease;
+    }
+    .modal-buttons button:hover {
+      background-color: #432c65;
+    }
+    /* Close Button */
+    .close {
+      position: absolute;
+      top: 12px;
+      right: 25px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .close:hover {
+      color: #54397e;
+    }
+    /* Additional Fields */
+    #selectAll {
+      margin-left: 0px;
+    }
+    #modEmailStatus {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    #modEmailStatus:focus {
+      border-color: #54397e;
+      box-shadow: 0 0 5px rgba(84, 57, 126, 0.5);
+      outline: none;
+    }
+    /* Sticky Styling */
+    .sticky-col {
+      position: sticky;
+      right: 0;
+      background-color: #f8f9fa;
+      z-index: 0;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+    thead .sticky-col {
+      position: sticky;
+      right: 0;
+      top: 0;
+      background-color: #54397e;
+      z-index: 3;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    }
+    td.email-status {
+      position: sticky;
+      right: 0;
+      background: #fff;
+      z-index: 1;
+    }
+    table thead th.email-status {
+      position: sticky;
+      right: 80px;
+      background-color:#54397e;
+      color: white;
+      z-index: 3;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    }
+    td.email-status {
+      position: sticky;
+      right: 80px;
+      background-color: white;
+      z-index: 0;
+    }
+    table tbody tr:nth-child(even) td.email-status {
+      background-color: #f2f2f2;
+    }
+    table tbody tr:nth-child(odd) td.email-status {
+      background-color: white;
+    }
+    table tbody tr:hover td.email-status {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-profile">
+      <img src="/Talentcornerlogo.jpg" alt="Talent Corner" class="profile-img"/>
+    </div>
+    <div class="sidebar-header">Talent Corner</div>
+    <div class="toggle-btn" onclick="toggleCandidateSidebar()">Candidate Data</div>
+    <div class="toggle-btn" onclick="toggleClientSidebar()">Franchises Data</div>
+    <a href="/logout" class="logout-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M10 2v2H4v16h6v2H2V2h8zm3.707 5.707L18.414 12l-4.707 4.293-1.414-1.414L15.586 12l-3.293-3.293 1.414-1.414z"/>
+      </svg>
+      Sign Out
+    </a>
+  </div>
+
+  <!-- Candidate Data Sidebar -->
+  <div class="candidate-sidebar" id="candidateSidebar">
+    <div class="sidebar-header-bar">
+      Candidate Data
+      <span class="close-btn" onclick="toggleCandidateSidebar()">✖</span>
+    </div>
+    <div class="sidebar-link" onclick="window.location.href='/datavisualization.html'">Data Visualization</div>
+    <div class="sidebar-link" onclick="window.location.href='dashboard.html'">Import Excel</div>
+    <div class="sidebar-link" onclick="window.location.href='imported_data.html'">Imported Data</div>
+    <div class="sidebar-link active" onclick="window.location.href='/form1data.html'">Form1 Data</div>
+    <div class="sidebar-link" onclick="window.location.href='candidate_ranking.html'">Candidate's Ranking</div>
+    <div class="sidebar-link" onclick="window.location.href='/AdminloginData.html'">Admin Login Data</div>
+  </div> 
+      
+  <!-- Client Data Sidebar -->
+  <div class="client-sidebar" id="clientSidebar">
+    <div class="sidebar-header-bar">
+      Franchises Data
+      <span class="close-btn" onclick="toggleClientSidebar()">✖</span>
+    </div>
+    <div class="sidebar-link" onclick="window.location.href='/Franchisesignupdata.html'">Franchises SignUp Data</div>
+    <div class="sidebar-link" onclick="window.location.href='/client2'">Client 2</div>
+  </div>
+  
+  <!-- Content Area -->
+  <div class="content">
+    <!-- Wrap header and user-count inside headerContainer -->
+    <div id="headerContainer">
+      <h1 id="pageHeader">Form1 Candidate Data</h1>
+      <div class="user-count-container">
+        <div class="user-count-card">
+          <div class="user-count-icon">👤</div>
+          <div class="user-count-info">
+            <div class="user-count-label">Total Users</div>
+            <div class="user-count-number" id="userCountDisplay">0</div>
+          </div>
+        </div>
+        <div class="user-count-card">
+          <div class="user-count-icon">✉️</div>
+          <div class="user-count-info">
+            <div class="user-count-label">Email Sent</div>
+            <div class="user-count-number" id="emailSentCountDisplay">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="messageContainer"></div>
+    <div id="processing" style="display: none; text-align: center; margin-bottom: 10px;">
+      <span class="small-spinner"></span>
+      <span>Processing, please wait...</span>
+    </div>
+    <div id="tableContainer"></div>
+    <div id="paginationContainer" class="pagination"></div>
+    <div id="emailSection" style="display: none;">
+      <button onclick="triggerSendEmailWithToken()">Send Email</button>
+      <button onclick="triggerDeleteSelected()">Delete Selected</button>
+      <button onclick="triggerDeleteAll()">Delete All</button>
+    </div>
+  </div>
+  
+  <!-- Fake Horizontal Scrollbar (Content Area Only) -->
+  <div class="scrollbar-wrapper" id="fakeScrollbar"></div>
+  
+  <!-- Modify Modal -->
+  <div id="modifyModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModifyModal()">&times;</span>
+      <div class="modal-content-inner">
+        <h3>Modify Record</h3>
+        <label for="modId">ID:</label>
+        <input type="text" id="modId" readonly />
+        <label for="modName">Name:</label>
+        <input type="text" id="modName" />
+        <label for="modEmail">Email:</label>
+        <input type="text" id="modEmail" />
+        <label for="modPhone">Phone:</label>
+        <input type="text" id="modPhone" />
+        <label for="modGender">Gender:</label>
+        <input type="text" id="modGender" />
+        <label for="modLocation">Location:</label>
+        <input type="text" id="modLocation" />
+        <label for="modCollege">College:</label>
+        <input type="text" id="modCollege" />
+        <label for="modTokenUrl">Token URL:</label>
+        <input type="text" id="modTokenUrl"/>
+        <label for="modEmailStatus">Email Status (0 = Pending, 1 = Sent):</label>
+        <input type="number" id="modEmailStatus" min="0" max="1" />
+      </div>
+      <div id="modalSpinner" style="display: none; text-align: center; margin-bottom: 10px;">
+        <span class="small-spinner"></span>
+        <span>Saving, please wait...</span>
+      </div>
+      <div class="modal-buttons">
+        <button onclick="closeModifyModal()">Cancel</button>
+        <button onclick="confirmModify()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal for Deletion -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cancelDelete()">&times;</span>
+      <div class="modal-content-inner">
+        <h3>Confirm Deletion</h3>
+        <p>Do you really want to delete the selected records?</p>
+      </div>
+      <div class="modal-buttons">
+        <button onclick="cancelDelete()">Cancel</button>
+        <button onclick="confirmDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete All Confirmation Modal -->
+  <div id="deleteAllModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeDeleteAllModal()">&times;</span>
+      <h3>Confirm Delete All</h3>
+      <p>Are you sure you want to delete ALL data? This action cannot be undone.</p>
+      <div class="modal-buttons">
+        <button onclick="closeDeleteAllModal()">Cancel</button>
+        <button onclick="confirmDeleteAll()">Yes, Delete All</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentData = null;
+    let currentPage = 1;
+    const ROWS_PER_PAGE = 50;
+    let modifyRecordId = null;
+
+    window.onload = function() {
+      // Load data immediately without spinner
+      loadData(false);
+      // Subsequent refreshes every 30 seconds show the spinner
+      setInterval(() => loadData(true), 30000);
+      
+      // Sequential fade in: header, then user-count, then table
+      const header = document.getElementById("pageHeader");
+      const userCount = document.querySelector(".user-count-container");
+      const table = document.getElementById("tableContainer");
+      
+      header.style.opacity = 1;
+      setTimeout(() => {
+        userCount.style.opacity = 1;
+      }, 500);
+      
+      setTimeout(() => {
+        table.style.opacity = 1;
+      }, 1000);
+    };
+
+    // Function to sync fake scrollbar width and scroll position with table
+    function syncScrollbars() {
+      const tableWrapper = document.querySelector('.table-wrapper');
+      const fakeScrollbar = document.getElementById("fakeScrollbar");
+      if (!tableWrapper || !fakeScrollbar) return;
+      fakeScrollbar.innerHTML = `<div class="scrollbar-inner" style="width: ${tableWrapper.scrollWidth}px;"></div>`;
+      fakeScrollbar.onscroll = function() {
+        tableWrapper.scrollLeft = fakeScrollbar.scrollLeft;
+      };
+      tableWrapper.onscroll = function() {
+        fakeScrollbar.scrollLeft = tableWrapper.scrollLeft;
+      };
+    }
+
+    // Updated notification functions
+
+    function showCustomMessage(message, type) {
+      const container = document.getElementById('messageContainer');
+      const headerContainer = document.getElementById('headerContainer');
+      
+      // Immediately hide header container
+      headerContainer.style.display = 'none';
+      
+      // Set message content and class
+      container.innerHTML = message;
+      if (type === 'error') {
+        container.className = 'error-message';
+      } else if (type === 'info') {
+        container.className = 'info-message';
+      } else {
+        container.className = 'success-message';
+      }
+      container.style.display = 'block';
+
+      // After 4 seconds, hide message and restore header container (if no processing is active)
+      setTimeout(() => {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        container.className = '';
+        // Only restore if processing is not visible
+        if (document.getElementById('processing').style.display !== 'block') {
+          headerContainer.style.display = 'flex';
+        }
+      }, 4000);
+    }
+
+    function showProcessing() {
+      const spinner = document.getElementById('processing');
+      const headerContainer = document.getElementById('headerContainer');
+      // Hide header container when processing starts
+      headerContainer.style.display = 'none';
+      spinner.style.display = 'block';
+      spinner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function hideProcessing() {
+      const spinner = document.getElementById('processing');
+      spinner.style.display = 'none';
+      const headerContainer = document.getElementById('headerContainer');
+      // Only restore header if no message is showing
+      if (document.getElementById('messageContainer').style.display !== 'block') {
+        headerContainer.style.display = 'flex';
+      }
+    }
+
+    function loadData(showSpinner = true) {
+      if (showSpinner) { 
+        showProcessing();
+      }
+      document.getElementById('emailSection').style.display = 'none';
+      fetch('/form1data?t=' + new Date().getTime())
+        .then(response => response.json())
+        .then(data => {
+          if (showSpinner) { 
+            hideProcessing();
+          }
+          currentData = data;
+          displayData(currentPage);
+          syncScrollbars();
+          document.getElementById('emailSection').style.display = 'block';
+        })
+        .catch(error => {
+          if (showSpinner) { 
+            hideProcessing();
+          }
+          showCustomMessage("Error loading data: " + error.message, "error");
+        });
+    }
+
+    function displayData(page) {
+      const container = document.getElementById('tableContainer');
+      if (!currentData || !currentData.headers || !currentData.rows || currentData.rows.length === 0) {
+        container.innerHTML = '<div class="error-message">No data found.</div>';
+        return;
+      }
+      currentPage = page;
+      const startIndex = (page - 1) * ROWS_PER_PAGE;
+      const endIndex = startIndex + ROWS_PER_PAGE;
+      const paginatedRows = currentData.rows.slice(startIndex, endIndex);
+      let tableHTML = '<div class="table-wrapper"><table>';
+      tableHTML += '<thead><tr>';
+      tableHTML += '<th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" /></th>';
+      currentData.headers.forEach(header => {
+        if (header.toLowerCase() !== 'email_sent') {
+          tableHTML += `<th>${header}</th>`;
+        }
+      });
+      tableHTML += '<th class="email-status">Email Status</th>';
+      tableHTML += '<th class="sticky-col">Actions</th>';
+      tableHTML += '</tr></thead><tbody>';
+      paginatedRows.forEach(row => {
+        let recordId = row.id;
+        let checkboxId = "checkbox_" + recordId;
+        let emailSent = row.email_sent == 1;
+        tableHTML += `<tr onclick="rowClicked(event, '${checkboxId}')">`;
+        tableHTML += `<td><input type="checkbox" id="${checkboxId}" class="emailCheckbox" data-recordid="${recordId}" onclick="event.stopPropagation();" /></td>`;
+        currentData.headers.forEach(header => {
+          if (header.toLowerCase() !== 'email_sent') {
+            tableHTML += `<td>${row[header.toLowerCase()] || ""}</td>`;
+          }
+        });
+        tableHTML += `<td class="email-status">${emailSent ? '<span style="color: green; font-weight: bold;">Sent</span>' : '<span style="color: orange;">Pending</span>'}</td>`;
+        tableHTML += `<td class="sticky-col" onclick="event.stopPropagation();"><button class="action-btn" onclick='openModifyModal(${recordId}, ${JSON.stringify(row).replace(/"/g, '&quot;')})'>Modify</button></td>`;
+        tableHTML += '</tr>';
+      });
+      tableHTML += '</tbody></table></div>';
+      container.innerHTML = tableHTML;
+      updatePagination();
+      updateUserCounts();
+    }
+
+    function rowClicked(event, checkboxId) {
+      if (event.target.tagName.toLowerCase() === 'input') return;
+      const checkbox = document.getElementById(checkboxId);
+      if (checkbox) checkbox.checked = !checkbox.checked;
+    }
+
+    function toggleSelectAll(source) {
+      const checkboxes = document.querySelectorAll('.emailCheckbox');
+      checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(currentData.rows.length / ROWS_PER_PAGE);
+      const paginationContainer = document.getElementById('paginationContainer');
+      let paginationHTML = `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+      paginationHTML += `<span class="pagination-info">Page ${currentPage} of ${totalPages}</span>`;
+      paginationHTML += `<button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Next</button>`;
+      paginationContainer.innerHTML = paginationHTML;
+    }
+
+    function changePage(page) {
+      displayData(page);
+    }
+
+    function openModifyModal(recordId, rowData) {
+      modifyRecordId = recordId;
+      document.getElementById('modId').value = recordId;
+      document.getElementById('modName').value = rowData.name;
+      document.getElementById('modEmail').value = rowData.email;
+      document.getElementById('modPhone').value = rowData.phone;
+      document.getElementById('modGender').value = rowData.gender;
+      document.getElementById('modLocation').value = rowData.location;
+      document.getElementById('modCollege').value = rowData.college;
+      document.getElementById('modTokenUrl').value = rowData.token_url || '';
+      document.getElementById('modEmailStatus').value = rowData.email_sent;
+      window.originalValues = {
+        email_sent: rowData.email_sent,
+        email: rowData.email
+      };
+      document.getElementById('modifyModal').style.display = 'block';
+    }
+
+    function closeModifyModal() {
+      document.getElementById('modifyModal').style.display = 'none';
+      modifyRecordId = null;
+      window.originalValues = null;
+    }
+
+    function confirmModify() {
+      const currentEmailStatus = document.getElementById('modEmailStatus').value;
+      const currentEmail = document.getElementById('modEmail').value;
+      let emailStatus = currentEmailStatus;
+      if (window.originalValues && currentEmail !== window.originalValues.email) {
+        emailStatus = "0";
+      }
+      const dataToSend = {
+        id: modifyRecordId,
+        name: document.getElementById('modName').value,
+        email: currentEmail,
+        phone: document.getElementById('modPhone').value,
+        gender: document.getElementById('modGender').value,
+        location: document.getElementById('modLocation').value,
+        college: document.getElementById('modCollege').value,
+        token_url: document.getElementById('modTokenUrl').value,
+        emailStatus: emailStatus
+      };
+      showProcessing();
+      fetch('/modify-form1-record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSend)
+      })
+      .then(response => response.json())
+      .then(result => {
+        hideProcessing();
+        if (result.success) {
+          showCustomMessage(result.message, 'success');
+          closeModifyModal();
+          loadData(true);
+        } else {
+          showCustomMessage(result.error, 'error');
+        }
+      })
+      .catch(error => {
+        hideProcessing();
+        showCustomMessage(error.message, 'error');
+      });
+    }
+
+    function triggerSendEmailWithToken() {
+      showProcessing();
+      fetch('/send-email-form1', { method: 'POST' })
+        .then(response => response.json())
+        .then(result => {
+          hideProcessing();
+          if (result.success) {
+            showCustomMessage(result.message, 'success');
+            loadData();
+          } else {
+            showCustomMessage(result.error, 'error');
+          }
+        })
+        .catch(error => {
+          hideProcessing();
+          showCustomMessage(error.message, 'error');
+        });
+    }
+
+    function triggerDeleteSelected() {
+      const checkboxes = document.querySelectorAll('.emailCheckbox:checked');
+      if (checkboxes.length === 0) {
+        showCustomMessage("No rows selected.", "error");
+        return;
+      }
+      openConfirmDeleteModal();
+    }
+
+    function openConfirmDeleteModal() {
+      document.getElementById('confirmModal').style.display = 'block';
+    }
+
+    function confirmDelete() {
+      document.getElementById('confirmModal').style.display = 'none';
+      let idsToDelete = [];
+      document.querySelectorAll('.emailCheckbox:checked').forEach(cb => {
+        const recordId = parseInt(cb.getAttribute('data-recordid'));
+        if (!isNaN(recordId)) { idsToDelete.push(recordId); }
+      });
+      showProcessing();
+      fetch('/delete-records-form1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: idsToDelete })
+      })
+      .then(response => response.json())
+      .then(result => {
+        hideProcessing();
+        if(result.success) {
+          showCustomMessage(result.message, "success");
+          loadData();
+        } else {
+          showCustomMessage(result.error, "error");
+        }
+      })
+      .catch(error => {
+        hideProcessing();
+        showCustomMessage(error.message, "error");
+      });
+    }
+
+    function cancelDelete() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+
+    function triggerDeleteAll() {
+      document.getElementById('deleteAllModal').style.display = 'flex';
+    }
+
+    function closeDeleteAllModal() {
+      document.getElementById('deleteAllModal').style.display = 'none';
+    }
+
+    function confirmDeleteAll() {
+      closeDeleteAllModal();
+      showProcessing();
+      fetch('/deleteAll-form1', { method: 'DELETE' })
+        .then(response => response.text())
+        .then(message => {
+          hideProcessing();
+          showCustomMessage(message, 'success');
+          loadData();
+        })
+        .catch(error => {
+          hideProcessing();
+          showCustomMessage(error.message, 'error');
+        });
+    }
+
+    function toggleCandidateSidebar() {
+      const candidateSidebar = document.getElementById("candidateSidebar");
+      const clientSidebar = document.getElementById("clientSidebar");
+      if (candidateSidebar.style.right === "0px") {
+        candidateSidebar.style.right = "-250px";
+      } else {
+        candidateSidebar.style.right = "0px";
+        clientSidebar.style.right = "-250px";
+      }
+    }
+
+    function toggleClientSidebar() {
+      const candidateSidebar = document.getElementById("candidateSidebar");
+      const clientSidebar = document.getElementById("clientSidebar");
+      if (clientSidebar.style.right === "0px") {
+        clientSidebar.style.right = "-250px";
+      } else {
+        clientSidebar.style.right = "0px";
+        candidateSidebar.style.right = "-250px";
+      }
+    }
+
+    function updateUserCounts() {
+      if (currentData && currentData.rows) {
+        document.getElementById('userCountDisplay').innerText = currentData.rows.length;
+        let emailSentCount = currentData.rows.filter(row => Number(row.email_sent) === 1).length;
+        document.getElementById('emailSentCountDisplay').innerText = emailSentCount;
+      }
+    }
+    // Add CSS to your stylesheet
+document.addEventListener('DOMContentLoaded', function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .user-count-container {
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+    }
+    
+    /* Animation for individual count cards */
+    .user-count-card {
+      transition: transform 0.3s ease-in-out;
+    }
+      .user-count-card:hover .user-count-number {
+      color: #4a90e2;
+    }
+    
+    .user-count-card:hover {
+      transform: translateY(-5px);
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Initialize animation on first load
+  setTimeout(() => {
+    const userCountContainer = document.querySelector('.user-count-container');
+    if (userCountContainer) {
+      userCountContainer.style.opacity = '1';
+    }
+  }, 800);
+});
+  </script>
+</body>
+</html>
